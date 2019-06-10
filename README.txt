@@ -1,0 +1,1 @@
+To run the game first install pygame and Python 3.5 or newer.
