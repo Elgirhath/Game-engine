@@ -88,14 +88,14 @@ class Vector():
         return point;
         
     def Rotate(vector, axis, angle):
-        from Quaternion import Quaternion
+        from lib.Quaternion import Quaternion
         rot_quat = Quaternion.Rot_quaternion(angle, axis)
         rotated_vector = Quaternion.Vector_quaternion_rotate(vector, rot_quat)
         return rotated_vector
         
     def Vector_round(vec):
-        import settings
-        from Other import Digits
+        from lib import settings
+        from lib.Other import Digits
         var1 = vec[0]
         var2 = vec[1]
         var3 = vec[2]
@@ -122,7 +122,7 @@ class Vector():
         """
             Returns scalars of the new R3 basis describing vector
         """
-        from Matrix import Matrix
+        from lib.Matrix import Matrix
         mat = Matrix([
                 [component_vector1[0], component_vector2[0], component_vector3[0]],
                 [component_vector1[1], component_vector2[1], component_vector3[1]],
@@ -135,7 +135,7 @@ class Vector():
         return scalars
     
     def World_to_local_space(point, transform):
-        from Quaternion import Quaternion
+        from lib.Quaternion import Quaternion
         x = point
         x = Vector.Difference(point, transform.position)
         if transform.rotation.norm>0:
@@ -143,7 +143,7 @@ class Vector():
         return x
     
     def Local_to_world_space(point, transform):
-        from Quaternion import Quaternion
+        from lib.Quaternion import Quaternion
         point_in_local = point
         if transform.rotation.norm>0:
             point_rotated = Quaternion.Vector_quaternion_rotate(point_in_local, transform.rotation)

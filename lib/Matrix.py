@@ -34,7 +34,7 @@ class Matrix():
         return Matrix(result_mat)
     
     def axis_rot (axis, angle):
-        from Vector import Vector
+        from lib.Vector import Vector
         axis = Vector.Normalize(axis)
         angle = math.radians(angle)
         axis_mat = Matrix.From_vector(axis)

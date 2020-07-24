@@ -6,8 +6,8 @@ class Rigidbody():
         self.time_in_air = 0
         
     def Move(self, vector):
-        import Mesh
-        from Vector import Vector
+        from lib import Mesh
+        from lib.Vector import Vector
         last_pos = self.parent.transform.position
         
         self.parent.transform.position = Vector.Add(self.parent.transform.position, vector)
@@ -27,13 +27,13 @@ class Rigidbody():
             self.parent.camera.pyramid.Update()
             
     def Apply(self):
-        from Vector import Vector
-        import Other
+        from lib.Vector import Vector
+        from lib import Other
         self.Move(Vector.Scale(self.velocity, Other.delta_time))
         
     def Dist_from_ground(self):
-        from Vector import Vector
-        from Ray import Ray
+        from lib.Vector import Vector
+        from lib.Ray import Ray
         ray = Ray(Vector.Local_to_world_space(self.parent.collider.center, self.parent.transform), (0,0,-1))
         if ray.Collide(self.parent).point and ray.Collide().point:
             dist_vector = Vector.Difference(ray.Collide().point, ray.Collide(self.parent).point)
@@ -42,9 +42,10 @@ class Rigidbody():
             return None
     
 def Gravity():
-    import Mesh
-    from Vector import Vector
-    import Other
+    from lib import Mesh
+    from lib.Vector import Vector
+    from lib import Other
+
     for obj in Mesh.objects:
         if obj.rigidbody:
             if obj.rigidbody.use_gravity:

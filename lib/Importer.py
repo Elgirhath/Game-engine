@@ -1,6 +1,7 @@
-from Quaternion import Quaternion
+from lib.Quaternion import Quaternion
+from lib import Mesh
+
 def Import_obj(obj_file, position, rotation = Quaternion(1, (0,0,0)), scale = (1,1,1)):
-    import Mesh
     path = "models/" + obj_file
     obj_lines = open(path, "r").readlines()
     vertices = []

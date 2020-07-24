@@ -43,7 +43,7 @@ class Ray():
                     return None
                 
     def Face_intersection(self, face):
-        import Geometry
+        from lib import Geometry
         intersection = self.Intersect_point(face.Surface())
         if intersection and Geometry.Point_in_polygon(intersection, face.vertex):
             return intersection
@@ -51,10 +51,10 @@ class Ray():
             return None
     
     def Collide(self, chosen_obj = None, ignore = None):
-        import Mesh
-        from Quaternion import Quaternion
-        from Vector import Vector
-        import Collider
+        from lib import Mesh
+        from lib.Quaternion import Quaternion
+        from lib.Vector import Vector
+        from lib import Collider
         k_min = None
         collider = None
         for obj in Mesh.objects:

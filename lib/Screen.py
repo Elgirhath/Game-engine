@@ -1,9 +1,10 @@
 import math
-import Other
-import BasicStructures
-from Vector import Vector
-import Geometry
-from Quaternion import Quaternion
+from lib import Other
+from lib import BasicStructures
+from lib.Vector import Vector
+from lib import Geometry
+from lib.Quaternion import Quaternion
+from lib.render.edge_render_helper import trim_edge_to_visible
 import time
 
 all_cameras = []
@@ -11,7 +12,7 @@ global main_camera
 
 class Camera():    
     def __init__(self, position, rotation = Quaternion(1,(0,0,0)), scale = (1,1,1), main = True, resolution = (1200, 600)):
-        from Transform import Transform
+        from lib.Transform import Transform
         self.transform = Transform(self, position, rotation, scale)
         self.global_transform = None
         if main == True or len(all_cameras)==0:
@@ -46,7 +47,7 @@ class View_pyramid():
         self.cam = cam
     
     def Top(self):
-        from Geometry import Surface
+        from lib.Geometry import Surface
         cam = self.cam
         tr = cam.global_transform
         vector = tr.forward
@@ -56,7 +57,7 @@ class View_pyramid():
         return surface.factors
     
     def Bottom(self):
-        from Geometry import Surface
+        from lib.Geometry import Surface
         cam = self.cam
         tr = cam.global_transform
         vector = tr.forward
@@ -65,7 +66,7 @@ class View_pyramid():
         self.bottom = surface
     
     def Left(self):
-        from Geometry import Surface
+        from lib.Geometry import Surface
         cam = main_camera
         tr = cam.global_transform
         vector = tr.forward
@@ -74,7 +75,7 @@ class View_pyramid():
         self.left = surface
     
     def Right(self):
-        from Geometry import Surface
+        from lib.Geometry import Surface
         cam = self.cam
         tr = cam.global_transform
         vector = tr.forward
@@ -83,7 +84,7 @@ class View_pyramid():
         self.right = surface
     
     def Clip(self):
-        from Geometry import Surface
+        from lib.Geometry import Surface
         cam = self.cam
         tr = cam.global_transform
         normal = tr.forward
@@ -115,7 +116,7 @@ class View_pyramid():
     
 def World_to_screen(point):
     """Get view of the point on screen"""
-    from Geometry import Surface
+    from lib.Geometry import Surface
     tr = main_camera.global_transform
     
     screen_surface = Surface.From_normal(tr.forward, point)
@@ -162,17 +163,14 @@ def Is_visible2d(point):
         return True
     
 def Render():
-    import Mesh
-    import pyinit
-#    Mesh._sort_faces_()
-#    for obj in Mesh.objects:
-#        Draw(obj, obj.material.color, pyinit.game_display)
+    from lib import Mesh
+    from lib import pyinit
     for face in Mesh.all_faces:
         Draw(face, face.material.color, pyinit.game_display)
 
 def Draw(obj, color, display):
     import pygame
-    import Mesh
+    from lib import Mesh
     if type(obj) is Mesh.Edge:
         edge2d = World_to_screen_edge(obj)
         if edge2d:
@@ -241,117 +239,23 @@ def Draw(obj, color, display):
             center = Geometry.Center_of_mass(vertices)
             vertices = Geometry.Sort_clockwise(vertices, center)
             pygame.draw.polygon(display, color, vertices)
-            
-def _cut_edge_(origin, end):
-    from Ray import Ray
-    from Geometry import Surface
-    ray = Ray(origin, Vector.Difference(end, origin))
-    intersections = []
-            
-    top = main_camera.pyramid.top
-    bottom = main_camera.pyramid.bottom
-    right = main_camera.pyramid.right
-    left = main_camera.pyramid.left
-    clip = main_camera.pyramid.clip
-            
-    intersection = ray.Intersect_point(bottom)
-    if intersection:
-        if Surface.Is_point_between_surfaces(right, left, intersection):
-            if clip.Point_relative_pos(intersection)>0:
-                intersections.append(intersection)
-                    
-    intersection = ray.Intersect_point(right)
-    if intersection:
-        if Surface.Is_point_between_surfaces(top, bottom, intersection):
-            if clip.Point_relative_pos(intersection)>0:
-                intersections.append(intersection)
-                
-    intersection = ray.Intersect_point(left)
-    if intersection:
-        if Surface.Is_point_between_surfaces(top, bottom, intersection):
-            if clip.Point_relative_pos(intersection)>0:
-                intersections.append(intersection)
-                
-    intersection = ray.Intersect_point(top)
-    if intersection:
-        if Surface.Is_point_between_surfaces(right, left, intersection):
-            if clip.Point_relative_pos(intersection)>0:
-                intersections.append(intersection)
-                
-    intersection = ray.Intersect_point(clip)
-    if intersection:
-        if Surface.Is_point_between_surfaces(right, left, intersection):
-            if Surface.Is_point_between_surfaces(top, bottom, intersection):
-                intersections.append(intersection)
-                
-    if len(intersections)<2:
-        return None
-    
-    
-    distance = Vector.Magnitude(Vector.Difference(end, origin))
-    new_origin = None
-    for intersection in intersections:
-        inter_distance = Vector.Magnitude(Vector.Difference(intersection, origin))
-        if inter_distance < distance:
-            distance = inter_distance
-            new_origin = intersection
-    if new_origin:
-        return new_origin
-    else:
-        return None
     
 def World_to_screen_edge(edge):
-    import Mesh
-    from Ray import Ray
-    
-    if Is_visible3d(edge.A) and Is_visible3d(edge.B):
-        origin_pos = World_to_screen(edge.A)
-        end_pos = World_to_screen(edge.B)
+    from lib import Mesh
+    from lib.Ray import Ray
+
+    trimmed_edge = trim_edge_to_visible(edge.A, edge.B, main_camera)
+                
+    if trimmed_edge:
+        origin_pos = World_to_screen(trimmed_edge.A)
+        end_pos = World_to_screen(trimmed_edge.B)
         return Mesh.Edge(origin_pos, end_pos)
-    elif Is_visible3d(edge.A) or Is_visible3d(edge.B):          
-        inversed = False
-        if Is_visible3d(edge.A):
-            origin = edge.A
-            end = edge.B
-        else:
-            inversed = True
-            origin = edge.B
-            end = edge.A
-        ray = Ray(origin, Vector.Difference(end, origin))
-        closest_intersection = None
-        distance = None
-        for surface in main_camera.pyramid.all_surfaces:
-            if ray.Intersect_point(surface):
-                intersection = ray.Intersect_point(surface)
-                tmp_distance = Vector.Magnitude(Vector.Difference(intersection, ray.origin))
-                if not distance or tmp_distance < distance:
-                    distance = tmp_distance
-                    closest_intersection = intersection
-                    
-        if not inversed:
-            origin_pos = World_to_screen(origin)
-            end_pos = World_to_screen(closest_intersection)
-        else:
-            origin_pos = World_to_screen(closest_intersection)
-            end_pos = World_to_screen(origin)
-        return Mesh.Edge(origin_pos, end_pos)
-        
     else:
-        origin = None
-        end = None
-        origin = _cut_edge_(edge.A, edge.B)
-        end = _cut_edge_(edge.B, edge.A)
-                    
-        if origin and end:
-            origin_pos = World_to_screen(origin)
-            end_pos = World_to_screen(end)
-            return Mesh.Edge(origin_pos, end_pos)
-        else:
-            return None
+        return None
 
 def _write_(msg, size, coordinates, bold = 0, color = (255,255,255)):
     import pygame
-    import pyinit
+    from lib import pyinit
     font = pygame.font.SysFont("Arial", size)
     if bold:
         font.set_bold(bold)
@@ -394,9 +298,9 @@ def log(*arg):
         _write_(msg, 15, coordinates)
 
 def Ray_on_pixel(point2d):
-    from Vector import Vector
+    from lib.Vector import Vector
     import math
-    from Ray import Ray
+    from lib.Ray import Ray
     tr = main_camera.global_transform
     dist_from_mid = Vector.Difference(point2d, main_camera.middle_pixel)
     tg_alfa = math.tan(math.radians(main_camera.FOV/2))*dist_from_mid[0]/(main_camera.resolution[0]/2)

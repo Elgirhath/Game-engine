@@ -1,3 +1,5 @@
+from lib.Vector import Vector
+
 class Surface():
     def __init__(self, factor_tupple):
         self.factors = factor_tupple
@@ -6,7 +8,6 @@ class Surface():
         return (self.factors[0], self.factors[1], self.factors[2])
     
     def Normalize(self):
-        from Vector import Vector
         normal = self.normal()
         if Vector.Magnitude(normal)!=0:
             scale = 1/Vector.Magnitude(normal)
@@ -15,16 +16,13 @@ class Surface():
             self.factors = (normal[0], normal[1], normal[2], d)
             
     def Invert_normal(self):
-        from Vector import Vector
         self.factors = Vector.Scale(self.factors, -1)
         
     def Switch_normal_by_vector(self, vector):
-        from Vector import Vector
         if Vector.Dot_product(self.normal(), vector)<0:
             self.Invert_normal()
         
     def From_points(vertex1, vertex2, vertex3):
-        from Vector import Vector
         plane_vector1 = Vector.Difference(vertex1, vertex2)
         plane_vector2 = Vector.Difference(vertex2, vertex3)
         normal = Vector.Cross_product(plane_vector1, plane_vector2)
@@ -45,7 +43,6 @@ class Surface():
         return surface
     
     def From_vectors(vector1, vector2, origin_point):
-        from Vector import Vector
         normal = Vector.Cross_product(vector1, vector2)
         normal = Vector.Normalize(normal)
         a = normal[0]
@@ -74,8 +71,7 @@ class Surface():
         """
             Returns vector perpendicular to the surface with origin on the surface and the ending on the point
         """
-        from Ray import Ray
-        from Vector import Vector
+        from lib.Ray import Ray
         if Ray(point, Vector.Scale(self.normal(), -1)).Intersect_point(self):
             ray = Ray(point, Vector.Scale(self.normal(), -1))
         else:
@@ -91,7 +87,6 @@ class Surface():
                 Distance from the surface if point is on positive side of surface
                 Negative distance if point is on negative side of surface
         """
-        from Vector import Vector
         vector = self.Perpen_vector_to_point(point)
         if Vector.Dot_product(vector, self.normal()) == 0:
             return 0
@@ -115,7 +110,6 @@ class Surface():
             return True
 
 def _sign_(point, vertex, line_origin, line_end):
-    from Vector import Vector
     cp1 = Vector.Cross_product(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(point, line_origin)))
     cp2 = Vector.Cross_product(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(vertex, line_origin)))
     if Vector.Dot_product(cp1, cp2) >= 0:
@@ -145,7 +139,6 @@ def Point_in_polygon(point, vertex_list):
     return False
     
 def Sort_clockwise(point_list, center):
-    from Vector import Vector
     if len(point_list) < 3:
         print("Sort_clockwise przyjal ", len(point_list), "punkt/y/ow")
         return point_list
@@ -170,7 +163,6 @@ def Sort_clockwise(point_list, center):
     return point_list
 
 def Center_of_mass(point_list):
-    from Vector import Vector
     if len(point_list[0])==2:
         vector_sum = (0,0)
         for i in range(0, len(point_list)):
@@ -185,6 +177,5 @@ def Center_of_mass(point_list):
         return average
     
 def Axis_view(point, axis):
-    from Vector import Vector
     k = Vector.Dot_product(point, axis)/Vector.Magnitude(point)**2
     return k

@@ -1,5 +1,5 @@
 import math
-from Vector import Vector
+from lib.Vector import Vector
 
 class Quaternion():
     def __init__(self, w, vector, struct = None):
@@ -49,7 +49,7 @@ class Quaternion():
         return Quaternion.Multiply(additional_rot_quaternion, init_rot_quaternion)
     
     def Face_rotate(face, quaternion):
-        import Mesh
+        from lib import Mesh
         new_vertices = []
         for vertex in face.vertex:
             new_vertices.append(Quaternion.Vector_quaternion_rotate(vertex, quaternion))

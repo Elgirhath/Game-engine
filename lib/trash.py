@@ -1,7 +1,7 @@
 def Z_Update():
     import time
-    from Ray import Ray
-    import Mesh
+    from lib.Ray import Ray
+    from lib import Mesh
     if len(Mesh.all_faces)<1:
         return
     for i in range(650, 651):
@@ -48,7 +48,7 @@ def Draw_z_buffer(surface):
             surface.set_at((i, j), color)
             
             
-""" From Screen.Draw() """
+""" from lib.Screen.Draw() """
     if type(obj) is BasicStructures.Edge:
         local_origin_pos = Vector.World_to_local_space(obj.A, main_camera.transform)
         local_end_pos = Vector.World_to_local_space(obj.B, main_camera.transform)

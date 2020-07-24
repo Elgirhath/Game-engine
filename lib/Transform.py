@@ -1,5 +1,6 @@
-from Vector import Vector
-from Quaternion import Quaternion
+from lib.Vector import Vector
+from lib.Quaternion import Quaternion
+from lib import Screen
 
 class Transform():
     def __init__(self, parent, position, rot, scale = (1,1,1)):
@@ -21,7 +22,6 @@ class Transform():
         
         self._update_mesh_()
         
-        import Screen
         if self.obj == Screen.main_camera:
             self.obj.pyramid.Update()
             
@@ -31,7 +31,6 @@ class Transform():
         
         self._update_mesh_()
         
-        import Screen
         if self.obj == Screen.main_camera:
             self.obj.pyramid.Update()
     
@@ -52,7 +51,6 @@ class Transform():
         self.up =  Quaternion.Vector_quaternion_rotate((0,0,1), self.rotation)
         self.down =  Quaternion.Vector_quaternion_rotate((0,0,-1), self.rotation)
         
-        import Screen
         if self.obj == Screen.main_camera:
             self.obj.pyramid.Update()
         
