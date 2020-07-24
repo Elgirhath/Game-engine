@@ -47,50 +47,50 @@ class View_pyramid():
         self.cam = cam
     
     def Top(self):
-        from lib.Geometry import Surface
+        from lib.Geometry import Plane
         cam = self.cam
         tr = cam.global_transform
         vector = tr.forward
         vector = Vector.Rotate(vector, tr.right, cam.FOV_vertical/2)
-        surface = Surface.From_vectors(vector, tr.right, tr.position)
-        self.top = surface
-        return surface.factors
+        plane = Plane.From_vectors(vector, tr.right, tr.position)
+        self.top = plane
+        return plane.factors
     
     def Bottom(self):
-        from lib.Geometry import Surface
+        from lib.Geometry import Plane
         cam = self.cam
         tr = cam.global_transform
         vector = tr.forward
         vector = Vector.Rotate(vector, tr.right, -cam.FOV_vertical/2)
-        surface = Surface.From_vectors(tr.right, vector, tr.position)
-        self.bottom = surface
+        plane = Plane.From_vectors(tr.right, vector, tr.position)
+        self.bottom = plane
     
     def Left(self):
-        from lib.Geometry import Surface
+        from lib.Geometry import Plane
         cam = main_camera
         tr = cam.global_transform
         vector = tr.forward
         vector = Vector.Rotate(vector, tr.up, cam.FOV/2)
-        surface = Surface.From_vectors(vector, tr.up, tr.position)
-        self.left = surface
+        plane = Plane.From_vectors(vector, tr.up, tr.position)
+        self.left = plane
     
     def Right(self):
-        from lib.Geometry import Surface
+        from lib.Geometry import Plane
         cam = self.cam
         tr = cam.global_transform
         vector = tr.forward
         vector = Vector.Rotate(vector, tr.up, -cam.FOV/2)
-        surface = Surface.From_vectors(tr.up, vector, tr.position)
-        self.right = surface
+        plane = Plane.From_vectors(tr.up, vector, tr.position)
+        self.right = plane
     
     def Clip(self):
-        from lib.Geometry import Surface
+        from lib.Geometry import Plane
         cam = self.cam
         tr = cam.global_transform
         normal = tr.forward
         point = Vector.Add(tr.position, Vector.Scale(tr.forward, cam.clip_min))
-        surface = Surface.From_normal(normal, point)
-        self.clip = surface
+        plane = Plane.From_normal(normal, point)
+        self.clip = plane
         
     def Update(self):
         self.cam.global_transform = self.cam.transform.To_global()
@@ -99,12 +99,12 @@ class View_pyramid():
         self.Left()
         self.Right()
         self.Clip()
-        self.all_surfaces = []
-        self.all_surfaces.append(self.top)
-        self.all_surfaces.append(self.bottom)
-        self.all_surfaces.append(self.left)
-        self.all_surfaces.append(self.right)
-        self.all_surfaces.append(self.clip)
+        self.all_planes = []
+        self.all_planes.append(self.top)
+        self.all_planes.append(self.bottom)
+        self.all_planes.append(self.left)
+        self.all_planes.append(self.right)
+        self.all_planes.append(self.clip)
     
     
 """****************************  Zmienne globalne i bufory  ***************************************"""
@@ -116,11 +116,11 @@ class View_pyramid():
     
 def World_to_screen(point):
     """Get view of the point on screen"""
-    from lib.Geometry import Surface
+    from lib.Geometry import Plane
     tr = main_camera.global_transform
     
-    screen_surface = Surface.From_normal(tr.forward, point)
-    screen_middle_point = Vector.Add(tr.position, Vector.Surface_cross_point(tr.position, tr.forward, screen_surface))
+    screen_plane = Plane.From_normal(tr.forward, point)
+    screen_middle_point = Vector.Add(tr.position, Vector.Plane_cross_point(tr.position, tr.forward, screen_plane))
         
     screen_width = math.tan(math.radians(main_camera.FOV/2))*Vector.Magnitude(Vector.Difference(screen_middle_point, tr.position))*2
     screen_height = screen_width / main_camera.aspect_ratio
@@ -143,15 +143,15 @@ def World_to_screen(point):
 
 def Is_visible3d(point):
     threshold = 0
-    if main_camera.pyramid.top.Point_relative_pos(point) < threshold:
+    if main_camera.pyramid.top.get_signed_distance_to_point(point) < threshold:
         return False
-    elif main_camera.pyramid.bottom.Point_relative_pos(point) < threshold:
+    elif main_camera.pyramid.bottom.get_signed_distance_to_point(point) < threshold:
         return False
-    elif main_camera.pyramid.left.Point_relative_pos(point) < threshold:
+    elif main_camera.pyramid.left.get_signed_distance_to_point(point) < threshold:
         return False
-    elif main_camera.pyramid.right.Point_relative_pos(point) < threshold:
+    elif main_camera.pyramid.right.get_signed_distance_to_point(point) < threshold:
         return False
-    elif main_camera.pyramid.clip.Point_relative_pos(point) < threshold:
+    elif main_camera.pyramid.clip.get_signed_distance_to_point(point) < threshold:
         return False
     else:
         return True
@@ -221,7 +221,7 @@ def Draw(obj, color, display):
                 if not exists:
                     vertices.append(screen_edge.B)
         
-        face_surface = Geometry.Surface.From_normal(obj.normal, obj.vertex[0])
+        face_plane = Geometry.Plane.From_normal(obj.normal, obj.vertex[0])
         pixels = [main_camera.left_top_pixel,
                   main_camera.left_bottom_pixel,
                   main_camera.right_top_pixel,
@@ -229,7 +229,7 @@ def Draw(obj, color, display):
         
         for pixel in pixels:
             ray = Ray_on_pixel(pixel)
-            intersection = ray.Intersect_point(face_surface)
+            intersection = ray.Intersect_point(face_plane)
             if intersection:
                 if Geometry.Point_in_polygon(intersection, obj.vertex):
                     vertices.append(pixel)

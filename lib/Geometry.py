@@ -1,6 +1,6 @@
 from lib.Vector import Vector
 
-class Surface():
+class Plane():
     def __init__(self, factor_tupple):
         self.factors = factor_tupple
         
@@ -31,16 +31,16 @@ class Surface():
         b = normal[1]
         c = normal[2]
         d = -normal[0]*vertex1[0]-normal[1]*vertex1[1]-normal[2]*vertex1[2]
-        surface = Surface((a,b,c,d))
-        return surface
+        plane = Plane((a,b,c,d))
+        return plane
 
     def From_normal(normal, point):
         a = normal[0]
         b = normal[1]
         c = normal[2]
         d = -normal[0]*point[0]-normal[1]*point[1]-normal[2]*point[2]
-        surface = Surface((a,b,c,d))
-        return surface
+        plane = Plane((a,b,c,d))
+        return plane
     
     def From_vectors(vector1, vector2, origin_point):
         normal = Vector.Cross_product(vector1, vector2)
@@ -49,8 +49,8 @@ class Surface():
         b = normal[1]
         c = normal[2]
         d = -normal[0]*origin_point[0]-normal[1]*origin_point[1]-normal[2]*origin_point[2]
-        surface = Surface((a,b,c,d))
-        return surface
+        plane = Plane((a,b,c,d))
+        return plane
     
     def Contains_point(self, point):
         a = self.factors[0]
@@ -66,34 +66,23 @@ class Surface():
             return True
         else:
             return False
-        
-    def Perpen_vector_to_point(self, point):
-        """
-            Returns vector perpendicular to the surface with origin on the surface and the ending on the point
-        """
-        from lib.Ray import Ray
-        if Ray(point, Vector.Scale(self.normal(), -1)).Intersect_point(self):
-            ray = Ray(point, Vector.Scale(self.normal(), -1))
-        else:
-            ray = Ray(point, Vector.Scale(self.normal(), 1))
-        intersection = ray.Intersect_point(self)
-        vector = Vector.Difference(point, intersection)
-        return vector
     
-    def Point_relative_pos(self, point):
+    def get_signed_distance_to_point(self, point):
         """
             Returns:
-                0 if point lays on the surface
-                Distance from the surface if point is on positive side of surface
-                Negative distance if point is on negative side of surface
+                0 if point lays on the plane
+                Distance from the plane if point is on positive side of plane
+                Negative distance if point is on negative side of plane
         """
-        vector = self.Perpen_vector_to_point(point)
-        if Vector.Dot_product(vector, self.normal()) == 0:
-            return 0
-        elif Vector.Dot_product(vector, self.normal()) > 0:
-            return Vector.Magnitude(vector)
+        if self.factors[2] != 0.0:
+            plane_point = (0.0, 0.0, -self.factors[3] / self.factors[2])
+        elif self.factors[1] != 0.0:
+            plane_point = (0.0, -self.factors[3] / self.factors[1], 0.0)
         else:
-            return -Vector.Magnitude(vector)
+            plane_point = (-self.factors[3] / self.factors[0], 0.0, 0.0)
+
+        points_diff = Vector.Difference(point, plane_point)
+        return Vector.Dot_product(points_diff, self.normal())
         
     def string(self):
         return str(self.factors[0]) + "*x + " + str(self.factors[1]) + "*y + " + str(self.factors[2]) + "*z + " + str(self.factors[3]) + " = 0"
@@ -101,9 +90,9 @@ class Surface():
     def string_z(self):
         return "z = " + "(-"+str(self.factors[0]) + "*x - " + str(self.factors[1]) + "*y - " + str(self.factors[3])+ ") / " + str(self.factors[2])
 
-    def Is_point_between_surfaces(surface1, surface2, point):
-        rel_pos1 = surface1.Point_relative_pos(point)
-        rel_pos2 = surface2.Point_relative_pos(point)
+    def Is_point_between_planes(plane1, plane2, point):
+        rel_pos1 = plane1.get_signed_distance_to_point(point)
+        rel_pos2 = plane2.get_signed_distance_to_point(point)
         if rel_pos1 < 0 or rel_pos2 < 0:
             return False
         else:

@@ -19,8 +19,8 @@ def Z_Update():
 #            
 #            ray = Ray(main_camera.transform.position, ray_direction)
 #            for face in Mesh.all_faces:
-#                if (ray.Intersect_point(face.surface())):
-#                    point = ray.Intersect_point(face.surface())
+#                if (ray.Intersect_point(face.plane())):
+#                    point = ray.Intersect_point(face.plane())
 #                    if (Vector.Dot_product(Vector.Difference(point, main_camera.transform.position), ray_direction)<=0):
 #                        continue
 #                    elif Geometry.Point_in_triangle(point, face.vertex):
@@ -32,7 +32,7 @@ def Z_Update():
             start = time.clock() - start
             print(start)
                             
-def Draw_z_buffer(surface):
+def Draw_z_buffer(plane):
     for i in range(0, Camera.resolution[0]):
         for j in range(0, Camera.resolution[1]):
             color = (255,0,0)
@@ -45,7 +45,7 @@ def Draw_z_buffer(surface):
                 if color[2]>255:
                     color = (color[0], color[1], 255)
                 
-            surface.set_at((i, j), color)
+            plane.set_at((i, j), color)
             
             
 """ from lib.Screen.Draw() """

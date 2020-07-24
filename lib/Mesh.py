@@ -150,13 +150,13 @@ class Face():
         
         self.material = material
     
-    def Surface(self):
+    def Plane(self):
         from lib import Geometry
         a = self.normal[0]
         b = self.normal[1]
         c = self.normal[2]
         d = -self.normal[0]*self.vertex[0][0]-self.normal[1]*self.vertex[0][1]-self.normal[2]*self.vertex[0][2]
-        return Geometry.Surface((a,b,c,d))
+        return Geometry.Plane((a,b,c,d))
     
     def Calculate_normal(self, inverted = False):
         plane_vector1 = Vector.Difference(self.vertex[0], self.vertex[1])

@@ -3,14 +3,14 @@ class Ray():
         self.origin = origin
         self.direction = direction
         
-    def Intersect_point(self, surface):
+    def Intersect_point(self, plane):
         """
             pivot = (xp, yp, zp)
             direction = (xd, yd, zd)
             a(xp + kxd) + b(yp + kyd) + c(zp + kzd) + d = 0
             k(axd + byd + czd) = - axp - byp - czp - d
             1* - axp - byp - czp - d = 0
-                pivot lays on the surface
+                pivot lays on the plane
             2* - axp - byp - czp - d != 0
                 a) axd + byd + czd = 0
                     no intersection
@@ -18,10 +18,10 @@ class Ray():
                     k = -(axp + byp + czp + d)/(axd + byd + czd)
                     ***** If k<0 - Ray doesn't really intersect!!! *****
         """
-        a = surface.factors[0]
-        b = surface.factors[1]
-        c = surface.factors[2]
-        d = surface.factors[3]
+        a = plane.factors[0]
+        b = plane.factors[1]
+        c = plane.factors[2]
+        d = plane.factors[3]
         xp = self.origin[0]
         yp = self.origin[1]
         zp = self.origin[2]
@@ -44,7 +44,7 @@ class Ray():
                 
     def Face_intersection(self, face):
         from lib import Geometry
-        intersection = self.Intersect_point(face.Surface())
+        intersection = self.Intersect_point(face.Plane())
         if intersection and Geometry.Point_in_polygon(intersection, face.vertex):
             return intersection
         else:

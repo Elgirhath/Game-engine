@@ -107,11 +107,11 @@ class Vector():
             var3 = round(var3, Digits(settings.threshold))
         return (var1, var2, var3)
         
-    def Surface_cross_point(vector_origin, vector, surface):
+    def Plane_cross_point(vector_origin, vector, plane):
         """
-            Scales the vector so that it ends on the surface
+            Scales the vector so that it ends on the plane
         """
-        scalar = (- vector_origin[0] * surface.factors[0] - vector_origin[1] * surface.factors[1] - vector_origin[2] * surface.factors[2] - surface.factors[3])/(vector[0] * surface.factors[0] + vector[1] * surface.factors[1] + vector[2] * surface.factors[2])
+        scalar = (- vector_origin[0] * plane.factors[0] - vector_origin[1] * plane.factors[1] - vector_origin[2] * plane.factors[2] - plane.factors[3])/(vector[0] * plane.factors[0] + vector[1] * plane.factors[1] + vector[2] * plane.factors[2])
         return (vector[0]*scalar,vector[1]*scalar,vector[2]*scalar)
         
     def Angle_between_vectors(vector_1, vector_2):
