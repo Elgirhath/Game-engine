@@ -161,7 +161,7 @@ class Face():
     def Calculate_normal(self, inverted = False):
         plane_vector1 = Vector.Difference(self.vertex[0], self.vertex[1])
         plane_vector2 = Vector.Difference(self.vertex[1], self.vertex[2])
-        normal = Vector.Cross_product(plane_vector1, plane_vector2)
+        normal = Vector.cross(plane_vector1, plane_vector2)
         normal = Vector.Normalize(normal)
         if not inverted:
             return normal
@@ -182,7 +182,7 @@ def _sort_faces_():
     while switch:
         switch = False
         for i in range(0, len(all_faces)-1):
-            if Vector.Dot_product(all_faces[i].normal, Screen.main_camera.global_transform.forward)<0:
+            if Vector.dot(all_faces[i].normal, Screen.main_camera.global_transform.forward)<0:
                 vc = all_faces[i].normal
             else:
                 vc = Vector.Scale(all_faces[i].normal, -1)
@@ -194,7 +194,7 @@ def _sort_faces_():
                 else:
                     above = False
             if not above and not below:
-                if Vector.Dot_product(all_faces[i+1].normal, Screen.main_camera.global_transform.forward)<0:
+                if Vector.dot(all_faces[i+1].normal, Screen.main_camera.global_transform.forward)<0:
                     vc = all_faces[i+1].normal
                 else:
                     vc = Vector.Scale(all_faces[i+1].normal, -1)

@@ -13,7 +13,7 @@ def Z_Update():
 #            rotation_x_angle = ray_rotation_pixels[0]*main_camera.FOV/main_camera.resolution[0]
 #            ray_direction = Vector.Rotate(ray_direction, main_camera.transform.up, rotation_x_angle)
 #            
-#            rotation_y_axis = Vector.Cross_product(ray_direction, main_camera.transform.up)
+#            rotation_y_axis = Vector.cross(ray_direction, main_camera.transform.up)
 #            rotation_y_angle = ray_rotation_pixels[1]*main_camera.FOV_vertical/main_camera.resolution[1]
 #            ray_direction = Vector.Rotate(ray_direction, rotation_y_axis, rotation_y_angle)
 #            
@@ -21,7 +21,7 @@ def Z_Update():
 #            for face in Mesh.all_faces:
 #                if (ray.Intersect_point(face.plane())):
 #                    point = ray.Intersect_point(face.plane())
-#                    if (Vector.Dot_product(Vector.Difference(point, main_camera.transform.position), ray_direction)<=0):
+#                    if (Vector.dot(Vector.Difference(point, main_camera.transform.position), ray_direction)<=0):
 #                        continue
 #                    elif Geometry.Point_in_triangle(point, face.vertex):
 #                        if z_buffer[i][j]:

@@ -39,7 +39,7 @@ class Matrix():
         angle = math.radians(angle)
         axis_mat = Matrix.From_vector(axis)
         a = Matrix.I(3).Scale(math.cos(angle))
-        b = Matrix.Cross_product_matrix(axis_mat).Scale(math.sin(angle))
+        b = Matrix.cross_matrix(axis_mat).Scale(math.sin(angle))
         c = Matrix.Scale(axis_mat.Multiply(axis_mat.Transposed()), (1-math.cos(angle)))
         R = Matrix.Sum((a,b,c))
         return R
@@ -78,46 +78,6 @@ class Matrix():
                 algebraic_complement = Matrix(temp_matrix)
                 deter += first_row[i] * (-1)**(i+2) * algebraic_complement.Det()
             return deter
-        
-    def Square_solutions(mat, constant_terms):
-        dets = []
-        for i in range(0,len(mat.struct)):
-            swapped_struct = []
-            for verse in mat.struct:
-                swapped_struct.append(list(verse))
-            
-            k=0
-            for verse in swapped_struct:
-                verse.pop(i)
-                verse.insert(i, constant_terms[k])
-                k+=1
-            swapped_matrix = Matrix(swapped_struct)
-            dets.append(swapped_matrix.Det())
-        solutions = []
-        for det in dets:
-            solutions.append(det/mat.Det())
-        return solutions
-    
-    def Solutions(self, constant_terms):
-#        constant_terms - wyrazy wolne
-        if len(self.struct) == len(self.struct[0]):
-            if self.Det()== 0:
-                print("Determinant equal to 0")
-            else:
-                return Matrix.Square_solutions(self, constant_terms)
-        elif len(self.struct) > len(self.struct[0]):
-            for l in range(0, len(self.struct)-1):
-                for k in range (l+1, len(self.struct)):
-                    struct = []
-                    struct.append(self.struct[l])
-                    struct.append(self.struct[k])
-                    frag_matrix = Matrix(struct)
-                    if frag_matrix.Det()!=0:
-                        return frag_matrix.Square_solutions((constant_terms[l], constant_terms[k]))
-                        
-        else:
-            print("Za duzo niewiadomych")
-            return 0
     
     def Vector_product(self, vector):
         m = self.struct
@@ -142,7 +102,7 @@ class Matrix():
                 new_struct.append(new_row)
             return Matrix(new_struct)
         
-    def Cross_product_matrix(vector_mat):
+    def cross_matrix(vector_mat):
         if len(vector_mat.struct) == 3:
             mat = Matrix([[0, -vector_mat.struct[2][0], vector_mat.struct[1][0]], [vector_mat.struct[2][0], 0, -vector_mat.struct[0][0]], [-vector_mat.struct[1][0], vector_mat.struct[0][0], 0]])
             return mat

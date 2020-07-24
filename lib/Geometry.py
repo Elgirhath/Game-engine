@@ -19,13 +19,13 @@ class Plane():
         self.factors = Vector.Scale(self.factors, -1)
         
     def Switch_normal_by_vector(self, vector):
-        if Vector.Dot_product(self.normal(), vector)<0:
+        if Vector.dot(self.normal(), vector)<0:
             self.Invert_normal()
         
     def From_points(vertex1, vertex2, vertex3):
         plane_vector1 = Vector.Difference(vertex1, vertex2)
         plane_vector2 = Vector.Difference(vertex2, vertex3)
-        normal = Vector.Cross_product(plane_vector1, plane_vector2)
+        normal = Vector.cross(plane_vector1, plane_vector2)
         normal = Vector.Normalize(normal)
         a = normal[0]
         b = normal[1]
@@ -43,7 +43,7 @@ class Plane():
         return plane
     
     def From_vectors(vector1, vector2, origin_point):
-        normal = Vector.Cross_product(vector1, vector2)
+        normal = Vector.cross(vector1, vector2)
         normal = Vector.Normalize(normal)
         a = normal[0]
         b = normal[1]
@@ -82,7 +82,7 @@ class Plane():
             plane_point = (-self.factors[3] / self.factors[0], 0.0, 0.0)
 
         points_diff = Vector.Difference(point, plane_point)
-        return Vector.Dot_product(points_diff, self.normal())
+        return Vector.dot(points_diff, self.normal())
         
     def string(self):
         return str(self.factors[0]) + "*x + " + str(self.factors[1]) + "*y + " + str(self.factors[2]) + "*z + " + str(self.factors[3]) + " = 0"
@@ -99,9 +99,9 @@ class Plane():
             return True
 
 def _sign_(point, vertex, line_origin, line_end):
-    cp1 = Vector.Cross_product(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(point, line_origin)))
-    cp2 = Vector.Cross_product(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(vertex, line_origin)))
-    if Vector.Dot_product(cp1, cp2) >= 0:
+    cp1 = Vector.cross(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(point, line_origin)))
+    cp2 = Vector.cross(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(vertex, line_origin)))
+    if Vector.dot(cp1, cp2) >= 0:
         return True
     else:
         return False
@@ -139,11 +139,11 @@ def Sort_clockwise(point_list, center):
         switch = False
         for i in range(0, len(point_list)):
             if i == 0:
-                if Vector.Cross_product_2d(point_list[i], point_list[len(point_list)-1]) < 0:
+                if Vector.cross_2d(point_list[i], point_list[len(point_list)-1]) < 0:
                     point_list[i], point_list[len(point_list)-1] = point_list[len(point_list)-1], point_list[i]
                     switch = True
                 
-            elif Vector.Cross_product_2d(point_list[i], point_list[i-1]) < 0:
+            elif Vector.cross_2d(point_list[i], point_list[i-1]) < 0:
                 point_list[i], point_list[i-1] = point_list[i-1], point_list[i]
                 switch = True
     for i in range(0, len(point_list)):
@@ -166,5 +166,5 @@ def Center_of_mass(point_list):
         return average
     
 def Axis_view(point, axis):
-    k = Vector.Dot_product(point, axis)/Vector.Magnitude(point)**2
+    k = Vector.dot(point, axis)/Vector.Magnitude(point)**2
     return k

@@ -16,7 +16,7 @@ class Vector():
             print("Blad rozmiaru wektora:   ", str(vector))
             return 0
     
-    def Dot_product(vector_1, vector_2):
+    def dot(vector_1, vector_2):
         a =vector_1[0]*vector_2[0]
         b = vector_1[1]*vector_2[1]
         c = vector_1[2]*vector_2[2]
@@ -52,10 +52,10 @@ class Vector():
             else:
                 print("Scale_div divides by 0! Vector_2 = ", vector_2)
         
-    def Cross_product(vector_1, vector_2):
+    def cross(vector_1, vector_2):
         return (vector_1[1]*vector_2[2]-vector_1[2]*vector_2[1], vector_1[2]*vector_2[0]-vector_1[0]*vector_2[2], vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0])
     
-    def Cross_product_2d(vector_1, vector_2):
+    def cross_2d(vector_1, vector_2):
         return vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0]
 
     
@@ -115,24 +115,18 @@ class Vector():
         return (vector[0]*scalar,vector[1]*scalar,vector[2]*scalar)
         
     def Angle_between_vectors(vector_1, vector_2):
-        cos_a = Vector.Dot_product(vector_1, vector_2)/(Vector.Magnitude(vector_1) * Vector.Magnitude(vector_2))
+        cos_a = Vector.dot(vector_1, vector_2)/(Vector.Magnitude(vector_1) * Vector.Magnitude(vector_2))
         return math.degrees(math.acos(cos_a))
     
-    def Distribution_between(vector, component_vector1, component_vector2, component_vector3):
+    def convert_to_different_space(vector, component_vector1, component_vector2, component_vector3):
         """
             Returns scalars of the new R3 basis describing vector
         """
-        from lib.Matrix import Matrix
-        mat = Matrix([
-                [component_vector1[0], component_vector2[0], component_vector3[0]],
-                [component_vector1[1], component_vector2[1], component_vector3[1]],
-                [component_vector1[2], component_vector2[2], component_vector3[2]],])
-    
-        a = (vector[0])
-        b = (vector[1])
-        c = (vector[2])
-        scalars = mat.Solutions((a, b, c)) #the scalars of component vectors
-        return scalars
+        x = Vector.dot(vector, component_vector1) / Vector.Magnitude(component_vector1) ** 2
+        y = Vector.dot(vector, component_vector2) / Vector.Magnitude(component_vector2) ** 2
+        z = Vector.dot(vector, component_vector3) / Vector.Magnitude(component_vector3) ** 2
+
+        return (x, y, z)
     
     def World_to_local_space(point, transform):
         from lib.Quaternion import Quaternion

@@ -125,7 +125,7 @@ def World_to_screen(point):
     screen_width = math.tan(math.radians(main_camera.FOV/2))*Vector.Magnitude(Vector.Difference(screen_middle_point, tr.position))*2
     screen_height = screen_width / main_camera.aspect_ratio
     
-    component_vector_scalars = Vector.Distribution_between(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
+    component_vector_scalars = Vector.convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
 
     point_right_vector = Vector.Vector_round(Vector.Add(Vector.Scale(tr.right, screen_width/2), Vector.Scale(tr.right, component_vector_scalars[0])))
     point_down_vector = Vector.Vector_round(Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, component_vector_scalars[1])))
@@ -186,13 +186,13 @@ def Draw(obj, color, display):
             
     if type(obj) is Mesh.Mesh:
         for face in obj.faces:
-            if Vector.Dot_product(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal)<=0:
+            if Vector.dot(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal)<=0:
                 Draw(face, color, display)
 #        for edge in obj.edges:
 #            Draw(edge, color, display)
             
     if type(obj) is Mesh.Face:
-        if not Vector.Dot_product(Vector.Difference(obj.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), obj.normal)<=0:
+        if not Vector.dot(Vector.Difference(obj.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), obj.normal)<=0:
             return
         edges = []
         if len(obj.vertex) == 3:

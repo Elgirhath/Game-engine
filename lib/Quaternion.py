@@ -29,7 +29,7 @@ class Quaternion():
         s_2 = quaternion_2.w
         v = quaternion_1.vector
         w = quaternion_2.vector
-        return Quaternion(s_1 * s_2 - Vector.Dot_product(v, w), Vector.Add(Vector.Add(Vector.Scale(w, s_1), Vector.Scale(v, s_2)), Vector.Cross_product(v, w)))
+        return Quaternion(s_1 * s_2 - Vector.dot(v, w), Vector.Add(Vector.Add(Vector.Scale(w, s_1), Vector.Scale(v, s_2)), Vector.cross(v, w)))
     
     def Rot_quaternion(angle, axis):
         axis = Vector.Normalize(axis)

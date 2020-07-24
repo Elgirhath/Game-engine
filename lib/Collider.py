@@ -79,7 +79,7 @@ def SAT_collision(collider1, collider2):
         min1 = None
         max1 = None
         for point in points1:
-            axis_view = Vector.Dot_product(rotated_normal, point)
+            axis_view = Vector.dot(rotated_normal, point)
             if min1 == None or min1 > axis_view:
                 min1 = axis_view
             if max1 == None or max1 < axis_view:
@@ -88,7 +88,7 @@ def SAT_collision(collider1, collider2):
         min2 = None
         max2 = None
         for point in points2:
-            axis_view = Vector.Dot_product(rotated_normal, point)
+            axis_view = Vector.dot(rotated_normal, point)
             if min2 == None or min2 > axis_view:
                 min2 = axis_view
             if max2 == None or max2 < axis_view:
@@ -102,7 +102,7 @@ def SAT_collision(collider1, collider2):
         min1 = None
         max1 = None
         for point in points1:
-            axis_view = Vector.Dot_product(rotated_normal, point)
+            axis_view = Vector.dot(rotated_normal, point)
             if min1 == None or min1 > axis_view:
                 min1 = axis_view
             if max1 == None or max1 < axis_view:
@@ -111,7 +111,7 @@ def SAT_collision(collider1, collider2):
         min2 = None
         max2 = None
         for point in points2:
-            axis_view = Vector.Dot_product(rotated_normal, point)
+            axis_view = Vector.dot(rotated_normal, point)
             if min2 == None or min2 > axis_view:
                 min2 = axis_view
             if max2 == None or max2 < axis_view:
