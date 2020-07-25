@@ -62,10 +62,7 @@ class Plane():
         y = point[1]
         z = point[2]
         
-        if a*x + b*y + c*z + d == 0:
-            return True
-        else:
-            return False
+        return abs(a*x + b*y + c*z + d) < 1e-6
     
     def get_signed_distance_to_point(self, point):
         """

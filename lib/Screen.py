@@ -4,14 +4,16 @@ from lib import BasicStructures
 from lib.Vector import Vector
 from lib import Geometry
 from lib.Quaternion import Quaternion
-from lib.render.edge_render_helper import trim_edge_to_visible
 import time
+import pygame
+from lib import Mesh
+from lib.render.world_screen_space_converter import world_to_screen_edge
 
 all_cameras = []
 global main_camera
 
 class Camera():    
-    def __init__(self, position, rotation = Quaternion(1,(0,0,0)), scale = (1,1,1), main = True, resolution = (1200, 600)):
+    def __init__(self, position, rotation = Quaternion.identity(), scale = (1,1,1), main = True, resolution = (1200, 600)):
         from lib.Transform import Transform
         self.transform = Transform(self, position, rotation, scale)
         self.global_transform = None
@@ -112,33 +114,6 @@ class View_pyramid():
 
     
 """****************************  Funkcje  ***************************************"""
-    
-    
-def world_to_screen_point(point):
-    """Get view of the point on screen"""
-    from lib.Geometry import Plane
-    tr = main_camera.global_transform
-    
-    screen_plane = Plane.From_normal(tr.forward, point)
-    screen_middle_point = Vector.Add(tr.position, Vector.Plane_cross_point(tr.position, tr.forward, screen_plane))
-        
-    screen_width = math.tan(math.radians(main_camera.FOV/2))*Vector.Magnitude(Vector.Difference(screen_middle_point, tr.position))*2
-    screen_height = screen_width / main_camera.aspect_ratio
-    
-    component_vector_scalars = Vector.convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
-
-    point_right_vector = Vector.Vector_round(Vector.Add(Vector.Scale(tr.right, screen_width/2), Vector.Scale(tr.right, component_vector_scalars[0])))
-    point_down_vector = Vector.Vector_round(Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, component_vector_scalars[1])))
-    point_right = Vector.Magnitude(point_right_vector)/screen_width
-    point_down = Vector.Magnitude(point_down_vector)/screen_height
-    scale_right = Vector.Scale_div(point_right_vector, tr.right)
-    if scale_right<0:
-        point_right=-point_right
-    scale_down = Vector.Scale_div(point_down_vector, tr.down)
-    if scale_down<0:
-        point_down=-point_down
-    return (point_right * main_camera.resolution[0], point_down * main_camera.resolution[1])
-
 
 
 def Is_visible3d(point):
@@ -163,95 +138,59 @@ def Is_visible2d(point):
         return True
     
 def Render():
-    from lib import Mesh
     from lib import pyinit
     for face in Mesh.all_faces:
-        Draw(face, face.material.color, pyinit.game_display)
+        draw_face(face, face.material.color, pyinit.game_display)
 
-def Draw(obj, color, display):
-    import pygame
-    from lib import Mesh
-    if type(obj) is Mesh.Edge:
-        edge2d = world_to_screen_edge(obj)
-        if edge2d:
-            pygame.draw.line(display, color, edge2d.A, edge2d.B, 3)
-                    
-    if type(obj) is BasicStructures.Cube:
-        for edge in obj.edges:
-            Draw(edge, color, display)
-            
-    if type(obj) is Mesh.Object:
-        if 'mesh' in dir(obj):
-            Draw(obj.mesh, color, display)
-            
-    if type(obj) is Mesh.Mesh:
-        for face in obj.faces:
-            if Vector.dot(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal)<=0:
-                Draw(face, color, display)
-#        for edge in obj.edges:
-#            Draw(edge, color, display)
-            
-    if type(obj) is Mesh.Face:
-        if not Vector.dot(Vector.Difference(obj.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), obj.normal)<=0:
-            return
-        edges = []
-        if len(obj.vertex) == 3:
-            edges.append(Mesh.Edge(obj.vertex[0], obj.vertex[1]))
-            edges.append(Mesh.Edge(obj.vertex[1], obj.vertex[2]))
-            edges.append(Mesh.Edge(obj.vertex[2], obj.vertex[0]))
-        elif len(obj.vertex) == 4:
-            edges.append(Mesh.Edge(obj.vertex[0], obj.vertex[1]))
-            edges.append(Mesh.Edge(obj.vertex[1], obj.vertex[2]))
-            edges.append(Mesh.Edge(obj.vertex[2], obj.vertex[3]))
-            edges.append(Mesh.Edge(obj.vertex[3], obj.vertex[0]))
-        vertices = []
-        for edge in edges:
-            screen_edge = world_to_screen_edge(edge)
-            if screen_edge:
-                exists = False
-                for i in range(0, len(vertices)):
-                    if vertices[i] == screen_edge.A:
-                        exists = True
-                if not exists:
-                    vertices.append(screen_edge.A)
-                exists = False
-                for i in range(0, len(vertices)):
-                    if vertices[i] == screen_edge.B:
-                        exists = True
-                if not exists:
-                    vertices.append(screen_edge.B)
-        
-        face_plane = Geometry.Plane.From_normal(obj.normal, obj.vertex[0])
-        pixels = [main_camera.left_top_pixel,
-                  main_camera.left_bottom_pixel,
-                  main_camera.right_top_pixel,
-                  main_camera.right_bottom_pixel]
-        
-        for pixel in pixels:
-            ray = Ray_on_pixel(pixel)
-            intersection = ray.Intersect_point(face_plane)
-            if intersection:
-                if Geometry.Point_in_polygon(intersection, obj.vertex):
-                    vertices.append(pixel)
-                    
-            
-        if len(vertices)>2:
-            center = Geometry.Center_of_mass(vertices)
-            vertices = Geometry.Sort_clockwise(vertices, center)
-            pygame.draw.polygon(display, color, vertices)
+def draw_mesh(mesh, color, display):
+    for face in mesh.faces:
+        if Vector.dot(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal)<=0:
+            draw_face(face, color, display)
+
+def draw_edge(edge, color, display):
+    edge2d = world_to_screen_edge(edge, main_camera)
+    if edge2d:
+        pygame.draw.line(display, color, edge2d.A, edge2d.B, 3)
+
+def draw_face(face, color, display):
+    if should_face_be_backwards_culled(face):
+        return
+
+    edges = face.get_edges()
     
-def world_to_screen_edge(edge):
-    from lib import Mesh
-    from lib.Ray import Ray
+    vertices = []
+    for edge in edges:
+        screen_edge = world_to_screen_edge(edge, main_camera)
+        if screen_edge:
+            if not screen_edge.A in vertices:
+                vertices.append(screen_edge.A)
+            if not screen_edge.B in vertices:
+                vertices.append(screen_edge.B)
 
-    trimmed_edge = trim_edge_to_visible(edge.A, edge.B, main_camera)
+    if len(vertices) < 2:
+        return
+    
+    face_plane = Geometry.Plane.From_normal(face.normal, face.vertex[0])
+    pixels = [main_camera.left_top_pixel,
+                main_camera.left_bottom_pixel,
+                main_camera.right_top_pixel,
+                main_camera.right_bottom_pixel]
+    
+    for pixel in pixels:
+        ray = Ray_on_pixel(pixel)
+        intersection = ray.intersect_plane(face_plane)
+        if intersection:
+            if Geometry.Point_in_polygon(intersection, face.vertex):
+                vertices.append(pixel)
                 
-    if trimmed_edge:
-        origin_pos = world_to_screen_point(trimmed_edge.A)
-        end_pos = world_to_screen_point(trimmed_edge.B)
-        return Mesh.Edge(origin_pos, end_pos)
-    else:
-        return None
+        
+    if len(vertices)>2:
+        center = Geometry.Center_of_mass(vertices)
+        vertices = Geometry.Sort_clockwise(vertices, center)
+        pygame.draw.polygon(display, color, vertices)
+
+def should_face_be_backwards_culled(face):
+    return Vector.dot(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal) > 0
 
 def _write_(msg, size, coordinates, bold = 0, color = (255,255,255)):
     import pygame

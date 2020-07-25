@@ -3,7 +3,7 @@ class Ray():
         self.origin = origin
         self.direction = direction
         
-    def Intersect_point(self, plane):
+    def intersect_plane(self, plane):
         """
             pivot = (xp, yp, zp)
             direction = (xd, yd, zd)
@@ -44,7 +44,7 @@ class Ray():
                 
     def Face_intersection(self, face):
         from lib import Geometry
-        intersection = self.Intersect_point(face.Plane())
+        intersection = self.intersect_plane(face.Plane())
         if intersection and Geometry.Point_in_polygon(intersection, face.vertex):
             return intersection
         else:

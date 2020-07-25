@@ -167,6 +167,22 @@ class Face():
         else:
             return Vector.Scale(normal, -1)
 
+    def get_edges(self):
+        edges = []
+        if len(self.vertex) == 3:
+            edges.append(Edge(self.vertex[0], self.vertex[1]))
+            edges.append(Edge(self.vertex[1], self.vertex[2]))
+            edges.append(Edge(self.vertex[2], self.vertex[0]))
+        elif len(self.vertex) == 4:
+            edges.append(Edge(self.vertex[0], self.vertex[1]))
+            edges.append(Edge(self.vertex[1], self.vertex[2]))
+            edges.append(Edge(self.vertex[2], self.vertex[3]))
+            edges.append(Edge(self.vertex[3], self.vertex[0]))
+        else:
+            raise Exception("Invalid number of vertices. Should equal to 3 or 4")
+
+        return edges
+
         
 class Edge():
     def __init__(self, start_pos, end_pos):

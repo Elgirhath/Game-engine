@@ -165,3 +165,13 @@ class Vector():
         for i in range(0, len(vector1)):
             result.append(vector1[i] * vector2[i])
         return tuple(result)
+
+    @staticmethod
+    def compare_magnitudes(vector1, vector2):
+        """
+            Returns:
+                positive number if vector1's magnitude is greater than vector2
+                0 if vector1's magnitude is equal to vector2's
+                negative number otherwise
+        """
+        return vector1[0] ** 2 + vector1[1] ** 2 + vector1[2] ** 2 - vector2[0] ** 2 - vector2[1] ** 2 - vector2[2] ** 2
