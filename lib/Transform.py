@@ -45,11 +45,11 @@ class Transform():
         self._update_mesh_()
             
         self.forward =  Quaternion.Vector_quaternion_rotate((1,0,0), self.rotation)
-        self.backward =  Quaternion.Vector_quaternion_rotate((-1,0,0), self.rotation)
+        self.backward =  Vector.Scale(self.forward, -1)
         self.right =  Quaternion.Vector_quaternion_rotate((0,-1,0), self.rotation)
-        self.left =  Quaternion.Vector_quaternion_rotate((0,1,0), self.rotation)
+        self.left =  Vector.Scale(self.right, -1)
         self.up =  Quaternion.Vector_quaternion_rotate((0,0,1), self.rotation)
-        self.down =  Quaternion.Vector_quaternion_rotate((0,0,-1), self.rotation)
+        self.down =  Vector.Scale(self.up, -1)
         
         if self.obj == Screen.main_camera:
             self.obj.pyramid.Update()

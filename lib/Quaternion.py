@@ -39,6 +39,9 @@ class Quaternion():
         return q
     
     def Vector_quaternion_rotate(vector, quaternion):
+        if quaternion == Quaternion.identity():
+            return vector
+
         q = quaternion
         q_inversed = q.inverse()
         Qp = Quaternion(0, vector)
@@ -55,3 +58,10 @@ class Quaternion():
             new_vertices.append(Quaternion.Vector_quaternion_rotate(vertex, quaternion))
         normal = Quaternion.Vector_quaternion_rotate(face.normal, quaternion)
         return Mesh.Face(new_vertices, normal)
+
+    @staticmethod
+    def identity():
+        return Quaternion(1, (0, 0, 0))
+
+    def __eq__(self, other):
+        return self.struct == other.struct

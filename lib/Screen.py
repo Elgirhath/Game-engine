@@ -114,7 +114,7 @@ class View_pyramid():
 """****************************  Funkcje  ***************************************"""
     
     
-def World_to_screen(point):
+def world_to_screen_point(point):
     """Get view of the point on screen"""
     from lib.Geometry import Plane
     tr = main_camera.global_transform
@@ -172,7 +172,7 @@ def Draw(obj, color, display):
     import pygame
     from lib import Mesh
     if type(obj) is Mesh.Edge:
-        edge2d = World_to_screen_edge(obj)
+        edge2d = world_to_screen_edge(obj)
         if edge2d:
             pygame.draw.line(display, color, edge2d.A, edge2d.B, 3)
                     
@@ -206,7 +206,7 @@ def Draw(obj, color, display):
             edges.append(Mesh.Edge(obj.vertex[3], obj.vertex[0]))
         vertices = []
         for edge in edges:
-            screen_edge = World_to_screen_edge(edge)
+            screen_edge = world_to_screen_edge(edge)
             if screen_edge:
                 exists = False
                 for i in range(0, len(vertices)):
@@ -240,15 +240,15 @@ def Draw(obj, color, display):
             vertices = Geometry.Sort_clockwise(vertices, center)
             pygame.draw.polygon(display, color, vertices)
     
-def World_to_screen_edge(edge):
+def world_to_screen_edge(edge):
     from lib import Mesh
     from lib.Ray import Ray
 
     trimmed_edge = trim_edge_to_visible(edge.A, edge.B, main_camera)
                 
     if trimmed_edge:
-        origin_pos = World_to_screen(trimmed_edge.A)
-        end_pos = World_to_screen(trimmed_edge.B)
+        origin_pos = world_to_screen_point(trimmed_edge.A)
+        end_pos = world_to_screen_point(trimmed_edge.B)
         return Mesh.Edge(origin_pos, end_pos)
     else:
         return None

@@ -96,15 +96,12 @@ class Vector():
     def Vector_round(vec):
         from lib import settings
         from lib.Other import Digits
-        var1 = vec[0]
-        var2 = vec[1]
-        var3 = vec[2]
-        if var1 % 1 <settings.threshold or (1-var1%1)<settings.threshold:
-            var1 = round(var1, Digits(settings.threshold))
-        if var2 % 1 <settings.threshold or (1-var2%1)<settings.threshold:
-            var2 = round(var2, Digits(settings.threshold))
-        if var3 % 1 <settings.threshold or (1-var3%1)<settings.threshold:
-            var3 = round(var3, Digits(settings.threshold))
+
+        digit_number = Digits(settings.threshold)
+
+        var1 = round(vec[0], digit_number)
+        var2 = round(vec[1], digit_number)
+        var3 = round(vec[2], digit_number)
         return (var1, var2, var3)
         
     def Plane_cross_point(vector_origin, vector, plane):

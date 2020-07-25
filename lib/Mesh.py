@@ -1,12 +1,12 @@
 from lib.Vector import Vector
 from lib import Collider
+from lib.Quaternion import Quaternion
 
 global all_faces
 all_faces = []
 objects = []
 
 class Object():
-    from lib.Quaternion import Quaternion
     def __init__(self, position, rotation = Quaternion(1, (0,0,0)), scale = (1,1,1), mesh = None, collider = None, name = "Default", material = None, parent = None):
         from lib.Transform import Transform
         from lib import Color
@@ -74,7 +74,6 @@ class Object():
         self.collider = Collider.Box_collider(self, collider_center, collider_size)
         
     def Set_collider(self, center, size, rotation = Quaternion(1, (0,0,0))):
-        from lib import Collider
         self.collider = Collider.Box_collider(self, center, size, rotation)
         
     def Set_mesh(self, mesh):
@@ -175,7 +174,7 @@ class Edge():
         self.B = end_pos
 
 def _sort_faces_():
-    #TODO: FIX THIS SHIT
+    #TODO: FIX THIS
     import lib.Screen
     from lib import Geometry
     switch = True
