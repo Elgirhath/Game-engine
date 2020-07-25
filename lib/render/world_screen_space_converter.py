@@ -28,9 +28,8 @@ def world_to_screen_point(point, camera):
     if scale_down<0:
         point_down=-point_down
     return (point_right * camera.resolution[0], point_down * camera.resolution[1])
-        
 
-def world_to_screen_edge(edge, camera):
+def world_to_screen_edge_unclamped(edge, camera):
     if is_point_behind_camera_clip(edge.A, camera) and is_point_behind_camera_clip(edge.B, camera):
         return None
 
@@ -38,9 +37,8 @@ def world_to_screen_edge(edge, camera):
 
     origin_pos = world_to_screen_point(edge.A, camera)
     end_pos = world_to_screen_point(edge.B, camera)
-    edge = Edge(origin_pos, end_pos)
 
-    return limit_edge_to_screen(edge, camera.resolution)
+    return Edge(origin_pos, end_pos)
 
 def limit_edge_to_camera_clip(edge, camera):
     if is_point_behind_camera_clip(edge.A, camera):

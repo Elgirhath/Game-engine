@@ -1,39 +1,56 @@
 from lib.Mesh import Face
-from lib.render.world_screen_space_converter import world_to_screen_edge
+from lib.render.world_screen_space_converter import world_to_screen_edge_unclamped, limit_edge_to_screen
 from lib import Geometry
 from lib import Screen
+from lib.util.is_point_in_polygon_resolver import is_point_in_polygon
+from lib import Input
 
 def world_to_screen_face(face, camera):
-    edges = face.get_edges()
-    
-    vertices = []
-    for edge in edges:
-        screen_edge = world_to_screen_edge(edge, camera)
-        if screen_edge:
-            if not screen_edge.A in vertices:
-                vertices.append(screen_edge.A)
-            if not screen_edge.B in vertices:
-                vertices.append(screen_edge.B)
+    edges_unclamped = get_screen_edges_unclamped(face, camera)
 
-    if len(vertices) < 2:
+    if len(edges_unclamped) < 2:
         return None
-    
-    face_plane = Geometry.Plane.From_normal(face.normal, face.vertex[0])
-    pixels = [camera.left_top_pixel,
+
+    vertices_unclamped = Geometry.sort_vertices(extract_vertices_from_edges(edges_unclamped))
+    corner_pixels = [camera.left_top_pixel,
                 camera.left_bottom_pixel,
                 camera.right_top_pixel,
                 camera.right_bottom_pixel]
-    
-    for pixel in pixels:
-        ray = Screen.Ray_on_pixel(pixel)
-        intersection = ray.intersect_plane(face_plane)
-        if intersection:
-            if Geometry.Point_in_polygon(intersection, face.vertex):
-                vertices.append(pixel)
+    vertices = []
+    for pixel in corner_pixels:
+        if is_point_in_polygon(pixel, vertices_unclamped):
+            vertices.append(pixel)
+
+    clamped_edges = clamp_edges(edges_unclamped, camera)
+    vertices.extend(extract_vertices_from_edges(clamped_edges))
 
     if len(vertices)>2:
-        center = Geometry.Center_of_mass(vertices)
-        vertices = Geometry.sort_vertices(vertices, center)
+        vertices = Geometry.sort_vertices(vertices)
         return vertices
 
     return None
+
+def get_screen_edges_unclamped(face, camera):
+    edges = []
+    for edge in face.get_edges():
+        screen_edge = world_to_screen_edge_unclamped(edge, camera)
+        if screen_edge:
+            edges.append(screen_edge)
+
+    return edges
+
+def extract_vertices_from_edges(edge_list):
+    vertices = set()
+    for edge in edge_list:
+        vertices.add(edge.A)
+        vertices.add(edge.B)
+    return list(vertices)
+
+def clamp_edges(edge_list, camera):
+    clamped_edges = []
+    for edge in edge_list:
+        edge = limit_edge_to_screen(edge, camera.resolution)
+        if edge != None:
+            clamped_edges.append(edge)
+
+    return clamped_edges

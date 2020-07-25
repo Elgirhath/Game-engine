@@ -94,48 +94,19 @@ class Plane():
             return False
         else:
             return True
-
-def _sign_(point, vertex, line_origin, line_end):
-    cp1 = Vector.cross(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(point, line_origin)))
-    cp2 = Vector.cross(Vector.To_3d(Vector.Difference(line_end, line_origin)), Vector.To_3d(Vector.Difference(vertex, line_origin)))
-    if Vector.dot(cp1, cp2) >= 0:
-        return True
-    else:
-        return False
-
-def Point_in_triangle(point, vertex_list):
-    a = _sign_(point, vertex_list[2], vertex_list[0], vertex_list[1])
-    if not a:
-        return False
-    b = _sign_(point, vertex_list[0], vertex_list[1], vertex_list[2])
-    if not b:
-        return False
-    c = _sign_(point, vertex_list[1], vertex_list[2], vertex_list[0])
-    if not c:
-        return False
-    else:
-        return True
     
-def Point_in_polygon(point, vertex_list):
-    origin = vertex_list[0]
-    for i in range(1, len(vertex_list)-1):
-        triangle = [origin, vertex_list[i], vertex_list[i+1]]
-        if Point_in_triangle(point, triangle):
-            return True
-    return False
-    
-def sort_vertices(point_list, center):
+def sort_vertices(point_list):
     if len(point_list) < 3:
-        print("Sort_clockwise przyjal ", len(point_list), "punkt/y/ow")
         return point_list
 
+    center = get_center_of_mass(point_list)
     comparison_vector = Vector.Difference(point_list[0], center)
 
     angles = [(0, 0.0)]
     for i in range(1, len(point_list)):
         p = Vector.Difference(point_list[i], center)
         angle = Vector.Angle_between_vectors(p, comparison_vector)
-        if Vector.cross_2d(p, comparison_vector) < 0:
+        if Vector.cross(p, comparison_vector) < 0:
             angle = 360 - angle
 
         angles.append((i, angle))
@@ -144,7 +115,7 @@ def sort_vertices(point_list, center):
 
     return [point_list[i] for i, _ in angles]
 
-def Center_of_mass(point_list):
+def get_center_of_mass(point_list):
     if len(point_list[0])==2:
         vector_sum = (0,0)
         for i in range(0, len(point_list)):

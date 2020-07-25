@@ -1,20 +1,17 @@
 import math
 
 class Vector():
-    def Division(vector_1, vector_2):
-        if vector_2[0]!=0 and vector_2[1]!=0 and vector_2[2]!=0:
+    def divide(vector_1, vector_2):
+        if len(vector_1) == 3:
             return (vector_1[0]/vector_2[0],vector_1[1]/vector_2[1],vector_1[2]/vector_2[2])
         else:
-            print("vector.division - dzielenie przez 0")
+            return (vector_1[0]/vector_2[0],vector_1[1]/vector_2[1])
             
     def Magnitude(vector):
         if len(vector) == 2:
             return math.sqrt(vector[0]**2+vector[1]**2)
-        elif len(vector) == 3:
-            return math.sqrt(vector[0]**2+vector[1]**2+vector[2]**2)
         else:
-            print("Blad rozmiaru wektora:   ", str(vector))
-            return 0
+            return math.sqrt(vector[0]**2+vector[1]**2+vector[2]**2)
     
     def dot(vector_1, vector_2):
         a = vector_1[0]*vector_2[0]
@@ -28,24 +25,19 @@ class Vector():
         return a + b + c
     
     def Scale(vector, scalar):
-        result_list = []
-        for i in range(0, len(vector)):
-            result_list.append(vector[i]*scalar)
-        result = tuple(result_list)
-        return result
+        if len(vector) == 2:
+            return (vector[0]*scalar, vector[1]*scalar)
+        else:
+            return (vector[0]*scalar, vector[1]*scalar, vector[2]*scalar)
     
     def Add(vector_1, vector_2):
-        if len(vector_1)== 2 and len(vector_2)== 2:
-            summary = (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1])
-        elif len(vector_1)== 3 and len(vector_2)== 3:
-            summary = (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1], vector_1[2] + vector_2[2])
+        if len(vector_1) == 2:
+            return (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1])
         else:
-            print("Blad rozmiaru wektora")
-            return 0
-        return summary
+            return (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1], vector_1[2] + vector_2[2])
     
     def Scale_div(vector_1, vector_2):
-        if len(vector_1) == 3 and len(vector_2) == 3:
+        if len(vector_1) == 3:
             if vector_2[0] != 0:
                 return vector_1[0]/vector_2[0]
             elif vector_2[1] != 0:
@@ -56,10 +48,10 @@ class Vector():
                 print("Scale_div divides by 0! Vector_2 = ", vector_2)
         
     def cross(vector_1, vector_2):
-        return (vector_1[1]*vector_2[2]-vector_1[2]*vector_2[1], vector_1[2]*vector_2[0]-vector_1[0]*vector_2[2], vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0])
-    
-    def cross_2d(vector_1, vector_2):
-        return vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0]
+        if len(vector_1) == 2:
+            return vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0]
+        else:
+            return (vector_1[1]*vector_2[2]-vector_1[2]*vector_2[1], vector_1[2]*vector_2[0]-vector_1[0]*vector_2[2], vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0])
 
     
     def Normalize(vector_1):
@@ -72,14 +64,10 @@ class Vector():
         return vector_1
     
     def Difference(vector_1, vector_2):
-        if len(vector_1)== 2 and len(vector_2)== 2:
-            diff = (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1])
-        elif len(vector_1)== 3 and len(vector_2)== 3:
-            diff = (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1], vector_1[2] - vector_2[2])
+        if len(vector_1) == 2:
+            return (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1])
         else:
-            print("Blad rozmiaru wektora")
-            return 0
-        return diff
+            return (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1], vector_1[2] - vector_2[2])
     
     def Homothety(point, origin, scalar):
         """
@@ -116,6 +104,11 @@ class Vector():
         
     def Angle_between_vectors(vector_1, vector_2):
         cos_a = Vector.dot(vector_1, vector_2)/(Vector.Magnitude(vector_1) * Vector.Magnitude(vector_2))
+        if cos_a > 1.0:
+            cos_a = 1.0
+        if cos_a < -1.0:
+            cos_a = -1.0
+            
         return math.degrees(math.acos(cos_a))
     
     def convert_to_different_space(vector, component_vector1, component_vector2, component_vector3):

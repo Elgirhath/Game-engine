@@ -1,3 +1,5 @@
+from lib.util.is_point_in_polygon_resolver import is_point_in_polygon
+
 class Ray():
     def __init__(self, origin, direction):
         self.origin = origin
@@ -43,9 +45,8 @@ class Ray():
                     return None
                 
     def Face_intersection(self, face):
-        from lib import Geometry
         intersection = self.intersect_plane(face.Plane())
-        if intersection and Geometry.Point_in_polygon(intersection, face.vertex):
+        if intersection and is_point_in_polygon(intersection, face.vertex):
             return intersection
         else:
             return None

@@ -7,7 +7,7 @@ from lib.Quaternion import Quaternion
 import time
 import pygame
 from lib import Mesh
-from lib.render.world_screen_space_converter import world_to_screen_edge
+from lib.render.world_screen_space_converter import world_to_screen_edge_unclamped
 from lib.render.world_to_screen_face_converter import world_to_screen_face
 
 all_cameras = []
@@ -149,7 +149,7 @@ def draw_mesh(mesh, color, display):
             draw_face(face, color, display)
 
 def draw_edge(edge, color, display):
-    edge2d = world_to_screen_edge(edge, main_camera)
+    edge2d = world_to_screen_edge_unclamped(edge, main_camera)
     if edge2d:
         pygame.draw.line(display, color, edge2d.A, edge2d.B, 3)
 

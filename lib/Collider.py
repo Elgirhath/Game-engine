@@ -8,9 +8,6 @@ class Sphere_collider():
         from lib.Vector import Vector
         if type(other) is Sphere_collider:
             if Vector.Distance(other.center, self.center) <= self.radius + other.radius:
-#                dif_vector = Vector.Difference(other.center, self.center)
-#                dif_vector = Vector.Normalize(dif_vector)
-#                collision_point = Vector.Scale(dif_vector, self.radius)
                 return True
         return False
             
