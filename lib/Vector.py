@@ -8,10 +8,7 @@ class Vector():
             return (vector_1[0]/vector_2[0],vector_1[1]/vector_2[1])
             
     def Magnitude(vector):
-        if len(vector) == 2:
-            return math.sqrt(vector[0]**2+vector[1]**2)
-        else:
-            return math.sqrt(vector[0]**2+vector[1]**2+vector[2]**2)
+        return math.sqrt(Vector.dot(vector, vector))
     
     def dot(vector_1, vector_2):
         a = vector_1[0]*vector_2[0]
@@ -115,9 +112,9 @@ class Vector():
         """
             Returns scalars of the new R3 basis describing vector
         """
-        x = Vector.dot(vector, component_vector1) / Vector.Magnitude(component_vector1) ** 2
-        y = Vector.dot(vector, component_vector2) / Vector.Magnitude(component_vector2) ** 2
-        z = Vector.dot(vector, component_vector3) / Vector.Magnitude(component_vector3) ** 2
+        x = Vector.dot(vector, component_vector1) / Vector.dot(component_vector1, component_vector1)
+        y = Vector.dot(vector, component_vector2) / Vector.dot(component_vector2, component_vector2)
+        z = Vector.dot(vector, component_vector3) / Vector.dot(component_vector3, component_vector3)
 
         return (x, y, z)
     
