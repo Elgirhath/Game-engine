@@ -124,29 +124,25 @@ def Point_in_polygon(point, vertex_list):
             return True
     return False
     
-def Sort_clockwise(point_list, center):
+def sort_vertices(point_list, center):
     if len(point_list) < 3:
         print("Sort_clockwise przyjal ", len(point_list), "punkt/y/ow")
         return point_list
-    for i in range(0, len(point_list)):
-        point_list[i] = Vector.Difference(point_list[i], center)
-    
-    switch = True
-    while switch:
-        switch = False
-        for i in range(0, len(point_list)):
-            if i == 0:
-                if Vector.cross_2d(point_list[i], point_list[len(point_list)-1]) < 0:
-                    point_list[i], point_list[len(point_list)-1] = point_list[len(point_list)-1], point_list[i]
-                    switch = True
-                
-            elif Vector.cross_2d(point_list[i], point_list[i-1]) < 0:
-                point_list[i], point_list[i-1] = point_list[i-1], point_list[i]
-                switch = True
-    for i in range(0, len(point_list)):
-        point_list[i] = Vector.Add(point_list[i], center)
 
-    return point_list
+    comparison_vector = Vector.Difference(point_list[0], center)
+
+    angles = [(0, 0.0)]
+    for i in range(1, len(point_list)):
+        p = Vector.Difference(point_list[i], center)
+        angle = Vector.Angle_between_vectors(p, comparison_vector)
+        if Vector.cross_2d(p, comparison_vector) < 0:
+            angle = 360 - angle
+
+        angles.append((i, angle))
+    
+    angles.sort(key=lambda a: a[1])
+
+    return [point_list[i] for i, _ in angles]
 
 def Center_of_mass(point_list):
     if len(point_list[0])==2:

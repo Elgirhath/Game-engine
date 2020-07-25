@@ -17,12 +17,15 @@ class Vector():
             return 0
     
     def dot(vector_1, vector_2):
-        a =vector_1[0]*vector_2[0]
+        a = vector_1[0]*vector_2[0]
         b = vector_1[1]*vector_2[1]
+
+        if len(vector_1) == 2:
+            return a + b
+
         c = vector_1[2]*vector_2[2]
-        
-        result = a + b + c
-        return result
+
+        return a + b + c
     
     def Scale(vector, scalar):
         result_list = []
@@ -41,11 +44,16 @@ class Vector():
             return 0
         return summary
     
-    def multiply_elementwise(vector_1, vector_2):
+    def Scale_div(vector_1, vector_2):
         if len(vector_1) == 3 and len(vector_2) == 3:
-            return vector_1[0]/vector_2[0]
-            return vector_1[1]/vector_2[1]
-            return vector_1[2]/vector_2[2]
+            if vector_2[0] != 0:
+                return vector_1[0]/vector_2[0]
+            elif vector_2[1] != 0:
+                return vector_1[1]/vector_2[1]
+            elif vector_2[2] != 0:
+                return vector_1[2]/vector_2[2]
+            else:
+                print("Scale_div divides by 0! Vector_2 = ", vector_2)
         
     def cross(vector_1, vector_2):
         return (vector_1[1]*vector_2[2]-vector_1[2]*vector_2[1], vector_1[2]*vector_2[0]-vector_1[0]*vector_2[2], vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0])

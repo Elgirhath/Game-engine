@@ -21,10 +21,10 @@ def world_to_screen_point(point, camera):
     point_down_vector = Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, point_in_camera_space[1]))
     point_right = Vector.Magnitude(point_right_vector)/screen_width
     point_down = Vector.Magnitude(point_down_vector)/screen_height
-    scale_right = Vector.multiply_elementwise(point_right_vector, tr.right)
+    scale_right = Vector.Scale_div(point_right_vector, tr.right)
     if scale_right<0:
         point_right=-point_right
-    scale_down = Vector.multiply_elementwise(point_down_vector, tr.down)
+    scale_down = Vector.Scale_div(point_down_vector, tr.down)
     if scale_down<0:
         point_down=-point_down
     return (point_right * camera.resolution[0], point_down * camera.resolution[1])

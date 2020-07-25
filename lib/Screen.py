@@ -8,6 +8,7 @@ import time
 import pygame
 from lib import Mesh
 from lib.render.world_screen_space_converter import world_to_screen_edge
+from lib.render.world_to_screen_face_converter import world_to_screen_face
 
 all_cameras = []
 global main_camera
@@ -156,37 +157,9 @@ def draw_face(face, color, display):
     if should_face_be_backwards_culled(face):
         return
 
-    edges = face.get_edges()
-    
-    vertices = []
-    for edge in edges:
-        screen_edge = world_to_screen_edge(edge, main_camera)
-        if screen_edge:
-            if not screen_edge.A in vertices:
-                vertices.append(screen_edge.A)
-            if not screen_edge.B in vertices:
-                vertices.append(screen_edge.B)
+    vertices = world_to_screen_face(face, main_camera)
 
-    if len(vertices) < 2:
-        return
-    
-    face_plane = Geometry.Plane.From_normal(face.normal, face.vertex[0])
-    pixels = [main_camera.left_top_pixel,
-                main_camera.left_bottom_pixel,
-                main_camera.right_top_pixel,
-                main_camera.right_bottom_pixel]
-    
-    for pixel in pixels:
-        ray = Ray_on_pixel(pixel)
-        intersection = ray.intersect_plane(face_plane)
-        if intersection:
-            if Geometry.Point_in_polygon(intersection, face.vertex):
-                vertices.append(pixel)
-                
-        
-    if len(vertices)>2:
-        center = Geometry.Center_of_mass(vertices)
-        vertices = Geometry.Sort_clockwise(vertices, center)
+    if vertices:
         pygame.draw.polygon(display, color, vertices)
 
 def should_face_be_backwards_culled(face):

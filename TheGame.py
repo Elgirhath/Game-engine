@@ -16,7 +16,7 @@ from lib import Rigidbody
 from lib.Ray import Ray
 
 player = Mesh.Object((0,0,0.9))
-cam = Screen.Camera((0,0,0.9), resolution = (1366,768))
+cam = Screen.Camera((0,0,0.9), resolution = (1360,768))
 player.Add_camera(cam)
 player.collider = Collider.Box_collider(player, (0, 0, 0), (0.1, 0.1, 0.85))
 
@@ -43,9 +43,6 @@ mouse_sensivity = 0.15
 
 cam.pyramid.Update()
 
-#test1 = Importer.Import_obj("test1.obj", (0,0,0))
-#test2 = Importer.Import_obj("test2.obj", (0,0,0))
-
 room = Importer.Import_obj("Room.obj", (0,0,0))
 room.Set_material(Color.Material(Color.grey))
 room.collider = None
@@ -69,27 +66,22 @@ for i in range(0, len(Mesh.all_faces)):
         
 floor_collider = Mesh.Object((0,0,0))
 floor_collider.rigidbody = None
-#floor_collider.rigidbody.use_gravity = False
 floor_collider.collider = Collider.Box_collider(floor_collider, (0, 0, -100), (100, 100, 100))
 
 range_collider = Mesh.Object((0,14,0))
 range_collider.rigidbody = None
-#range_collider.rigidbody.use_gravity = False
 range_collider.collider = Collider.Box_collider(range_collider, (0, 0, 0), (100, 10, 100))
 
 backwall_collider = Mesh.Object((0,-11,0))
 backwall_collider.rigidbody = None
-#backwall_collider.rigidbody.use_gravity = False
 backwall_collider.collider = Collider.Box_collider(backwall_collider, (0, 0, 0), (100, 10, 100))
 
 leftwall_collider = Mesh.Object((-20,0,0))
 leftwall_collider.rigidbody = None
-#leftwall_collider.rigidbody.use_gravity = False
 leftwall_collider.collider = Collider.Box_collider(leftwall_collider, (0, 0, 0), (10, 100, 100))
 
 rightwall_collider = Mesh.Object((25,0,0))
 rightwall_collider.rigidbody = None
-#rightwall_collider.rigidbody.use_gravity = False
 rightwall_collider.collider = Collider.Box_collider(rightwall_collider, (0, 0, 0), (10, 100, 100))
 
 
@@ -411,16 +403,14 @@ while not game_exit:
             
 
     if Vector.Distance(player.transform.position, button3.transform.position) < 1:
+        font = pygame.font.SysFont("Arial", 20)
         if not training:
-            font = pygame.font.SysFont("Arial", 20)
             text = "Wciśnij E, aby rozpocząć trening"
             Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
             if Input.Get_key_down("e"):
                 start_training = True
                 Reset_targets()
-                
         else:
-            font = pygame.font.SysFont("Arial", 20)
             text = "Wciśnij E, aby zatrzymać trening"
             Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
             if Input.Get_key_down("e"):
