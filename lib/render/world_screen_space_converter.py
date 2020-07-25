@@ -15,32 +15,19 @@ def world_to_screen_point(point, camera):
     screen_width = math.tan(math.radians(camera.FOV/2))*Vector.Magnitude(Vector.Difference(screen_middle_point, tr.position))*2
     screen_height = screen_width / camera.aspect_ratio
     
-    component_vector_scalars = Vector.convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
+    point_in_camera_space = Vector.convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
 
-    point_right_vector = Vector.Vector_round(Vector.Add(Vector.Scale(tr.right, screen_width/2), Vector.Scale(tr.right, component_vector_scalars[0])))
-    point_down_vector = Vector.Vector_round(Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, component_vector_scalars[1])))
+    point_right_vector = Vector.Add(Vector.Scale(tr.right, screen_width/2), Vector.Scale(tr.right, point_in_camera_space[0]))
+    point_down_vector = Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, point_in_camera_space[1]))
     point_right = Vector.Magnitude(point_right_vector)/screen_width
     point_down = Vector.Magnitude(point_down_vector)/screen_height
-    scale_right = Vector.Scale_div(point_right_vector, tr.right)
+    scale_right = Vector.multiply_elementwise(point_right_vector, tr.right)
     if scale_right<0:
         point_right=-point_right
-    scale_down = Vector.Scale_div(point_down_vector, tr.down)
+    scale_down = Vector.multiply_elementwise(point_down_vector, tr.down)
     if scale_down<0:
         point_down=-point_down
     return (point_right * camera.resolution[0], point_down * camera.resolution[1])
-
-
-def world_to_screen_edge1(edge, camera):
-
-    trimmed_edge = trim_edge_to_visible(edge.A, edge.B, camera)
-    # trimmed_edge = edge
-                
-    if trimmed_edge:
-        origin_pos = world_to_screen_point(trimmed_edge.A, camera)
-        end_pos = world_to_screen_point(trimmed_edge.B, camera)
-        return Edge(origin_pos, end_pos)
-    else:
-        return None
         
 
 def world_to_screen_edge(edge, camera):

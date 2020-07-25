@@ -41,16 +41,11 @@ class Vector():
             return 0
         return summary
     
-    def Scale_div(vector_1, vector_2):
+    def multiply_elementwise(vector_1, vector_2):
         if len(vector_1) == 3 and len(vector_2) == 3:
-            if vector_2[0] != 0:
-                return vector_1[0]/vector_2[0]
-            elif vector_2[1] != 0:
-                return vector_1[1]/vector_2[1]
-            elif vector_2[2] != 0:
-                return vector_1[2]/vector_2[2]
-            else:
-                print("Scale_div divides by 0! Vector_2 = ", vector_2)
+            return vector_1[0]/vector_2[0]
+            return vector_1[1]/vector_2[1]
+            return vector_1[2]/vector_2[2]
         
     def cross(vector_1, vector_2):
         return (vector_1[1]*vector_2[2]-vector_1[2]*vector_2[1], vector_1[2]*vector_2[0]-vector_1[0]*vector_2[2], vector_1[0]*vector_2[1]-vector_1[1]*vector_2[0])
@@ -127,7 +122,6 @@ class Vector():
     
     def World_to_local_space(point, transform):
         from lib.Quaternion import Quaternion
-        x = point
         x = Vector.Difference(point, transform.position)
         if transform.rotation.norm>0:
             x = Quaternion.Vector_quaternion_rotate(x, transform.rotation.inverse())
