@@ -9,6 +9,7 @@ import pygame
 from lib import Mesh
 from lib.render.world_screen_space_converter import world_to_screen_edge_unclamped
 from lib.render.world_to_screen_face_converter import world_to_screen_face
+from lib.util.world_local_space_converter import Local_to_world_space
 
 all_cameras = []
 global main_camera
@@ -163,7 +164,7 @@ def draw_face(face, color, display):
         pygame.draw.polygon(display, color, vertices)
 
 def should_face_be_backwards_culled(face):
-    return Vector.dot(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal) > 0
+    return Vector.dot(Vector.Difference(face.vertex[0], Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal) > 0
 
 def _write_(msg, size, coordinates, bold = 0, color = (255,255,255)):
     import pygame

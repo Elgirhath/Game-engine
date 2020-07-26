@@ -77,8 +77,8 @@ class Vector():
         
     def Rotate(vector, axis, angle):
         from lib.Quaternion import Quaternion
-        rot_quat = Quaternion.Rot_quaternion(angle, axis)
-        rotated_vector = Quaternion.Vector_quaternion_rotate(vector, rot_quat)
+        rot_quat = Quaternion.from_angle_axis(angle, axis)
+        rotated_vector = Quaternion.rotate_vector(vector, rot_quat)
         return rotated_vector
         
     def Vector_round(vec):
@@ -108,46 +108,14 @@ class Vector():
             
         return math.degrees(math.acos(cos_a))
     
-    def convert_to_different_space(vector, component_vector1, component_vector2, component_vector3):
-        """
-            Returns scalars of the new R3 basis describing vector
-        """
-        x = Vector.dot(vector, component_vector1) / Vector.dot(component_vector1, component_vector1)
-        y = Vector.dot(vector, component_vector2) / Vector.dot(component_vector2, component_vector2)
-        z = Vector.dot(vector, component_vector3) / Vector.dot(component_vector3, component_vector3)
-
-        return (x, y, z)
+    def To_2d(vector):
+        return (vector[0], vector[1])
     
-    def World_to_local_space(point, transform):
-        from lib.Quaternion import Quaternion
-        x = Vector.Difference(point, transform.position)
-        if transform.rotation.norm>0:
-            x = Quaternion.Vector_quaternion_rotate(x, transform.rotation.inverse())
-        return x
-    
-    def Local_to_world_space(point, transform):
-        from lib.Quaternion import Quaternion
-        point_in_local = point
-        if transform.rotation.norm>0:
-            point_rotated = Quaternion.Vector_quaternion_rotate(point_in_local, transform.rotation)
-        point_rotated_and_translated = Vector.Add(point_rotated, transform.position)
-        return point_rotated_and_translated
-    
-    def To_2d(vector3d):
-        if len(vector3d) == 2:
-            return vector3d
-        elif len(vector3d) == 3:
-            return (vector3d[0], vector3d[1])
-        else:
-            print("Podany vector3d ma zly rozmiar")
-    
-    def To_3d(vector2d):
-        if len(vector2d) == 3:
-            return vector2d
-        elif len(vector2d) == 2:
-            return (vector2d[0], vector2d[1], 0)
-        else:
-            print("Podany vector2d ma zly rozmiar")
+    def To_3d(vector):
+        if len(vector) == 3:
+            return vector
+            
+        return (vector[0], vector[1], 0)
             
     def Distance(point1, point2):
         return Vector.Magnitude(Vector.Difference(point2, point1))

@@ -95,40 +95,6 @@ class Plane():
         else:
             return True
     
-def sort_vertices(point_list):
-    if len(point_list) < 3:
-        return point_list
-
-    center = get_center_of_mass(point_list)
-    comparison_vector = Vector.Difference(point_list[0], center)
-
-    angles = [(0, 0.0)]
-    for i in range(1, len(point_list)):
-        p = Vector.Difference(point_list[i], center)
-        angle = Vector.Angle_between_vectors(p, comparison_vector)
-        if Vector.cross(p, comparison_vector) < 0:
-            angle = 360 - angle
-
-        angles.append((i, angle))
-    
-    angles.sort(key=lambda a: a[1])
-
-    return [point_list[i] for i, _ in angles]
-
-def get_center_of_mass(point_list):
-    if len(point_list[0])==2:
-        vector_sum = (0,0)
-        for i in range(0, len(point_list)):
-            vector_sum = Vector.Add(vector_sum, point_list[i])
-        average = Vector.Scale(vector_sum, (1/len(point_list)))
-        return average
-    elif len(point_list[0])==3:
-        vector_sum = (0,0, 0)
-        for i in range(0, len(point_list)):
-            vector_sum = Vector.Add(vector_sum, point_list[i])
-        average = Vector.Scale(vector_sum, (1/len(point_list)))
-        return average
-    
 def Axis_view(point, axis):
     k = Vector.dot(point, axis)/Vector.Magnitude(point)**2
     return k

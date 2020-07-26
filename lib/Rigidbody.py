@@ -1,3 +1,5 @@
+from lib.util.world_local_space_converter import Local_to_world_space
+
 class Rigidbody():
     def __init__(self, parent, velocity = (0,0,0), use_gravity = True):
         self.parent = parent
@@ -14,8 +16,6 @@ class Rigidbody():
         
         if 'collider' in dir(self.parent) and self.parent.collider:
             for obj in Mesh.objects:
-#                if Vector.Distance(obj.transform.position, self.parent.transform.position)>2:
-#                    continue
                 if obj != self.parent:
                     if self.parent.collider.Collide(obj.collider):
                         self.parent.transform.position = last_pos
@@ -34,7 +34,7 @@ class Rigidbody():
     def Dist_from_ground(self):
         from lib.Vector import Vector
         from lib.Ray import Ray
-        ray = Ray(Vector.Local_to_world_space(self.parent.collider.center, self.parent.transform), (0,0,-1))
+        ray = Ray(Local_to_world_space(self.parent.collider.center, self.parent.transform), (0,0,-1))
         if ray.Collide(self.parent).point and ray.Collide().point:
             dist_vector = Vector.Difference(ray.Collide().point, ray.Collide(self.parent).point)
             return Vector.Magnitude(dist_vector)

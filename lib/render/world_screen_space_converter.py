@@ -2,6 +2,7 @@ from lib.Mesh import Edge
 from lib.Ray import Ray
 from lib.Geometry import Plane
 from lib.Vector import Vector
+from lib.util.space_converter import convert_to_different_space
 import math
 from lib.render.edge_render_helper import trim_edge_to_visible
     
@@ -15,7 +16,7 @@ def world_to_screen_point(point, camera):
     screen_width = math.tan(math.radians(camera.FOV/2))*Vector.Magnitude(Vector.Difference(screen_middle_point, tr.position))*2
     screen_height = screen_width / camera.aspect_ratio
     
-    point_in_camera_space = Vector.convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
+    point_in_camera_space = convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
 
     point_right_vector = Vector.Add(Vector.Scale(tr.right, screen_width/2), Vector.Scale(tr.right, point_in_camera_space[0]))
     point_down_vector = Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, point_in_camera_space[1]))

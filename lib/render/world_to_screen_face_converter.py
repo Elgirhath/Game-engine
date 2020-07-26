@@ -4,6 +4,7 @@ from lib import Geometry
 from lib import Screen
 from lib.util.is_point_in_polygon_resolver import is_point_in_polygon
 from lib import Input
+from lib.render.vertex_sorter import sort_vertices
 
 def world_to_screen_face(face, camera):
     edges_unclamped = get_screen_edges_unclamped(face, camera)
@@ -11,7 +12,7 @@ def world_to_screen_face(face, camera):
     if len(edges_unclamped) < 2:
         return None
 
-    vertices_unclamped = Geometry.sort_vertices(extract_vertices_from_edges(edges_unclamped))
+    vertices_unclamped = sort_vertices(extract_vertices_from_edges(edges_unclamped))
     corner_pixels = [camera.left_top_pixel,
                 camera.left_bottom_pixel,
                 camera.right_top_pixel,
@@ -25,7 +26,7 @@ def world_to_screen_face(face, camera):
     vertices.extend(extract_vertices_from_edges(clamped_edges))
 
     if len(vertices)>2:
-        vertices = Geometry.sort_vertices(vertices)
+        vertices = sort_vertices(vertices)
         return vertices
 
     return None

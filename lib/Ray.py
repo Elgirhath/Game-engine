@@ -71,10 +71,10 @@ class Ray():
                     if not chosen_obj and Collider.Point_collision(obj.collider, self.origin):
                         continue
                     
-                    global_box_center = Vector.Add(Quaternion.Vector_quaternion_rotate(obj.collider.center, obj.transform.rotation), obj.transform.position)
+                    global_box_center = Vector.Add(Quaternion.rotate_vector(obj.collider.center, obj.transform.rotation), obj.transform.position)
                     global_difference = Vector.Difference(self.origin, global_box_center)
-                    local_ray_origin = Quaternion.Vector_quaternion_rotate(global_difference, obj.transform.rotation.conjugate())
-                    local_ray_dir = Quaternion.Vector_quaternion_rotate(self.direction, obj.transform.rotation.conjugate())
+                    local_ray_origin = Quaternion.rotate_vector(global_difference, obj.transform.rotation.conjugate())
+                    local_ray_dir = Quaternion.rotate_vector(self.direction, obj.transform.rotation.conjugate())
                     
 #                    size = (obj.collider.size[0] * obj.transform.scale[0], obj.collider.size[1] * obj.transform.scale[1], obj.collider.size[2] * obj.transform.scale[2])
                     size = obj.collider.size

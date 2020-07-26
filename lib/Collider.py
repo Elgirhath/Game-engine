@@ -58,21 +58,21 @@ def SAT_collision(collider1, collider2):
     from lib.Vector import Vector
     from lib.Quaternion import Quaternion
     points1 = list(collider1.points)
-    center1 = Vector.Add(collider1.parent.transform.position, Quaternion.Vector_quaternion_rotate(collider1.center, collider1.parent.transform.rotation))
+    center1 = Vector.Add(collider1.parent.transform.position, Quaternion.rotate_vector(collider1.center, collider1.parent.transform.rotation))
     for i in range(0, len(points1)):
-        points1[i] = Quaternion.Vector_quaternion_rotate(points1[i], collider1.parent.transform.rotation)
+        points1[i] = Quaternion.rotate_vector(points1[i], collider1.parent.transform.rotation)
         points1[i] = Vector.Add(points1[i], center1)
         
         
     points2 = list(collider2.points)
-    center2 = Vector.Add(collider2.parent.transform.position, Quaternion.Vector_quaternion_rotate(collider2.center, collider2.parent.transform.rotation))
+    center2 = Vector.Add(collider2.parent.transform.position, Quaternion.rotate_vector(collider2.center, collider2.parent.transform.rotation))
     for i in range(0, len(points2)):
-        points2[i] = Quaternion.Vector_quaternion_rotate(points2[i], collider2.parent.transform.rotation)
+        points2[i] = Quaternion.rotate_vector(points2[i], collider2.parent.transform.rotation)
         points2[i] = Vector.Add(points2[i], center2)
     
     
     for normal in collider1.normals:
-        rotated_normal = Quaternion.Vector_quaternion_rotate(Quaternion.Vector_quaternion_rotate(normal, collider1.rotation), collider1.parent.transform.rotation)
+        rotated_normal = Quaternion.rotate_vector(Quaternion.rotate_vector(normal, collider1.rotation), collider1.parent.transform.rotation)
         min1 = None
         max1 = None
         for point in points1:
@@ -95,7 +95,7 @@ def SAT_collision(collider1, collider2):
             return False
         
     for normal in collider2.normals:
-        rotated_normal = Quaternion.Vector_quaternion_rotate(Quaternion.Vector_quaternion_rotate(normal, collider2.rotation), collider2.parent.transform.rotation)
+        rotated_normal = Quaternion.rotate_vector(Quaternion.rotate_vector(normal, collider2.rotation), collider2.parent.transform.rotation)
         min1 = None
         max1 = None
         for point in points1:
@@ -121,8 +121,8 @@ def SAT_collision(collider1, collider2):
 def Point_collision(box, point):
     from lib.Quaternion import Quaternion
     from lib.Vector import Vector
-    box_center = Vector.Add(box.parent.transform.position, Quaternion.Vector_quaternion_rotate(box.center, box.parent.transform.rotation))
-    rotated_point = Quaternion.Vector_quaternion_rotate(Vector.Difference(point, box_center), box.parent.transform.rotation.conjugate())
+    box_center = Vector.Add(box.parent.transform.position, Quaternion.rotate_vector(box.center, box.parent.transform.rotation))
+    rotated_point = Quaternion.rotate_vector(Vector.Difference(point, box_center), box.parent.transform.rotation.conjugate())
     if abs(rotated_point[0]) > box.size[0]*box.parent.transform.scale[0]:
         return False
     if abs(rotated_point[1]) > box.size[1]*box.parent.transform.scale[1]:

@@ -37,18 +37,18 @@ class Transform():
     def Rotate(self, angle = 0, axis = (0, 0, 0), rotation = Quaternion(1,(0,0,0))):
         """Rotation of the object"""
         if axis == (0,0,0):
-            self.rotation = Quaternion.Rotation_compound(self.rotation, rotation)
+            self.rotation = Quaternion.composite_rotations(self.rotation, rotation)
         else:
-            rotQuaternion = Quaternion.Rot_quaternion(angle, axis)
-            self.rotation = Quaternion.Rotation_compound(self.rotation, rotQuaternion)
+            rotQuaternion = Quaternion.from_angle_axis(angle, axis)
+            self.rotation = Quaternion.composite_rotations(self.rotation, rotQuaternion)
         
         self._update_mesh_()
             
-        self.forward =  Quaternion.Vector_quaternion_rotate((1,0,0), self.rotation)
+        self.forward =  Quaternion.rotate_vector((1,0,0), self.rotation)
         self.backward =  Vector.Scale(self.forward, -1)
-        self.right =  Quaternion.Vector_quaternion_rotate((0,-1,0), self.rotation)
+        self.right =  Quaternion.rotate_vector((0,-1,0), self.rotation)
         self.left =  Vector.Scale(self.right, -1)
-        self.up =  Quaternion.Vector_quaternion_rotate((0,0,1), self.rotation)
+        self.up =  Quaternion.rotate_vector((0,0,1), self.rotation)
         self.down =  Vector.Scale(self.up, -1)
         
         if self.obj == Screen.main_camera:
@@ -60,7 +60,7 @@ class Transform():
         self._update_mesh_()
         
     def _rotate_vertex_(self, vertex_init):
-        resultant_local_pos = Quaternion.Vector_quaternion_rotate(vertex_init, self.rotation)
+        resultant_local_pos = Quaternion.rotate_vector(vertex_init, self.rotation)
         resultant_global_pos = Vector.Add(resultant_local_pos, self.position)
         return resultant_global_pos
     
@@ -86,23 +86,23 @@ class Transform():
                 for k in range(0, len(mesh.faces_init[i].vertex)):
                     vertex = Vector.Scale_by_vector(mesh.faces_init[i].vertex[k], self.scale)
                     mesh.faces[i].vertex[k] = self._rotate_vertex_(vertex)
-                mesh.faces[i].normal = Quaternion.Vector_quaternion_rotate(mesh.faces_init[i].normal, self.rotation)
+                mesh.faces[i].normal = Quaternion.rotate_vector(mesh.faces_init[i].normal, self.rotation)
                 
     def To_global(self, abc = 0):
         if self.obj.parent:
-            position = Vector.Add(self.obj.parent.transform.position, Quaternion.Vector_quaternion_rotate(self.position, self.obj.parent.transform.rotation))
-            rotation = Quaternion.Rotation_compound(self.rotation, self.obj.parent.transform.rotation)
-            scale = Quaternion.Vector_quaternion_rotate(self.scale, self.obj.parent.transform.rotation)
+            position = Vector.Add(self.obj.parent.transform.position, Quaternion.rotate_vector(self.position, self.obj.parent.transform.rotation))
+            rotation = Quaternion.composite_rotations(self.rotation, self.obj.parent.transform.rotation)
+            scale = Quaternion.rotate_vector(self.scale, self.obj.parent.transform.rotation)
             obj = self.obj
             
             transform = Transform(obj, position, rotation, scale)
             
-            transform.forward =  Quaternion.Vector_quaternion_rotate(self.forward, self.obj.parent.transform.rotation)
-            transform.backward =  Quaternion.Vector_quaternion_rotate(self.backward, self.obj.parent.transform.rotation)
-            transform.right =  Quaternion.Vector_quaternion_rotate(self.right, self.obj.parent.transform.rotation)
-            transform.left =  Quaternion.Vector_quaternion_rotate(self.left, self.obj.parent.transform.rotation)
-            transform.up =  Quaternion.Vector_quaternion_rotate(self.up, self.obj.parent.transform.rotation)
-            transform.down =  Quaternion.Vector_quaternion_rotate(self.down, self.obj.parent.transform.rotation)
+            transform.forward =  Quaternion.rotate_vector(self.forward, self.obj.parent.transform.rotation)
+            transform.backward =  Quaternion.rotate_vector(self.backward, self.obj.parent.transform.rotation)
+            transform.right =  Quaternion.rotate_vector(self.right, self.obj.parent.transform.rotation)
+            transform.left =  Quaternion.rotate_vector(self.left, self.obj.parent.transform.rotation)
+            transform.up =  Quaternion.rotate_vector(self.up, self.obj.parent.transform.rotation)
+            transform.down =  Quaternion.rotate_vector(self.down, self.obj.parent.transform.rotation)
             
             return transform
         else:
