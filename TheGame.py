@@ -8,6 +8,7 @@ from engine import (Collider, Color, Importer, Input, Mesh, Other, Rigidbody,
 from engine.Quaternion import Quaternion
 from engine.Ray import Ray
 from engine.Vector import Vector
+from engine.render import text_renderer
 
 player = Mesh.Object((0,0,0.9))
 cam = Screen.Camera((0,0,0.9), resolution = (1360,768))
@@ -384,12 +385,12 @@ while not game_exit:
             show_score = False
         font = pygame.font.SysFont("Arial", 20)
         text = "Trafiłeś " + str(target_count) + " tarcz!"
-        Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.3))), 2, Color.orange)
+        text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.3))), 2, Color.orange)
 
     if Vector.Distance(player.transform.position, button1.transform.position) < 1:
         font = pygame.font.SysFont("Arial", 20)
         text = "Wciśnij E, aby zresetować tarcze"
-        Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
+        text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
         if Input.Get_key_down("e"):
             Reset_targets()
             
@@ -398,13 +399,13 @@ while not game_exit:
         font = pygame.font.SysFont("Arial", 20)
         if not training:
             text = "Wciśnij E, aby rozpocząć trening"
-            Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
+            text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
             if Input.Get_key_down("e"):
                 start_training = True
                 Reset_targets()
         else:
             text = "Wciśnij E, aby zatrzymać trening"
-            Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
+            text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
             if Input.Get_key_down("e"):
                 target_sound.stop()
                 training = False
@@ -412,7 +413,7 @@ while not game_exit:
     if Vector.Distance(player.transform.position, guns.transform.position) < 2 and Gun.current_ammo<Gun.magazine_size:
         font = pygame.font.SysFont("Arial", 20)
         text = "Wciśnij R, aby uzupełnić amunicję"
-        Screen._write_(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
+        text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
         if Input.Get_key_down("r"):
             Gun.current_ammo = Gun.magazine_size
             reload_sound.play()
@@ -423,7 +424,7 @@ while not game_exit:
             text = "Traf jak najwiecej tarcz w 30 sekund!"
         else:
             text = str(int(training_timer)+1)
-        Screen._write_(text, 30, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.5))), 2, Color.orange)
+        text_renderer.write(text, 30, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.5))), 2, Color.orange)
     
     if start_training:
         if int(training_timer) < 4 and  int(training_timer) > int(training_timer - Other.delta_time):
@@ -442,11 +443,11 @@ while not game_exit:
     if training:
         font = pygame.font.SysFont("Arial", 15)
         text = "Czas: " + str(int(current_countdown))
-        Screen._write_(text, 20, (int(cam.resolution[0]*0.03) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.1))), 2, Color.orange)
+        text_renderer.write(text, 20, (int(cam.resolution[0]*0.03) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.1))), 2, Color.orange)
         
         font = pygame.font.SysFont("Arial", 15)
         text = "Trafione: " + str(target_count)
-        Screen._write_(text, 20, (int(cam.resolution[0]*0.9) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.1))), 2, Color.orange)
+        text_renderer.write(text, 20, (int(cam.resolution[0]*0.9) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.1))), 2, Color.orange)
 
         
     pygame.draw.circle(pyinit.game_display, Color.red, (cam.middle_pixel), int(0.003*cam.resolution[0]))

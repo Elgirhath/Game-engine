@@ -11,6 +11,7 @@ from engine.render.world_to_screen_face_converter import world_to_screen_face
 from engine.Transform import Transform
 from engine.util.world_local_space_converter import Local_to_world_space
 from engine.Vector import Vector
+from engine.render import text_renderer
 
 all_cameras = []
 global main_camera
@@ -34,8 +35,7 @@ class Camera():
         self.aspect_ratio = resolution[0]/resolution[1]
         self.FOV = 120
         
-        """tg(FOV/2) = tg(FOV_vertical/2)*aspect_ratio"""
-        
+        # tg(FOV/2) = tg(FOV_vertical/2)*aspect_ratio
         self.FOV_vertical = math.degrees(math.atan((math.tan(math.radians(self.FOV/2))/self.aspect_ratio)))*2
         
         self.middle_pixel = (int(Vector.Scale(main_camera.resolution, (1/2))[0]), int(Vector.Scale(main_camera.resolution, (1/2))[1]))
@@ -54,14 +54,13 @@ class Camera():
 """****************************  Funkcje  ***************************************"""
 
 def Is_visible2d(point):
-    if point[0]<=0 or point[0]>=main_camera.resolution[0] or point[1]<=0 or point[1]>=main_camera.resolution[1]:
-        return False
-    else:
-        return True
+    return point[0] > 0 and point[0] < main_camera.resolution[0] and point[1] > 0 and point[1] < main_camera.resolution[1]
     
 def Render():
     for face in Mesh.all_faces:
         draw_face(face, face.material.color, pyinit.game_display)
+
+    text_renderer.render()
 
 def draw_mesh(mesh, color, display):
     for face in mesh.faces:
@@ -84,13 +83,6 @@ def draw_face(face, color, display):
 
 def should_face_be_backwards_culled(face):
     return Vector.dot(Vector.Difference(face.vertex[0], Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal) > 0
-
-def _write_(msg, size, coordinates, bold = 0, color = (255,255,255)):
-    font = pygame.font.SysFont("Arial", size)
-    if bold:
-        font.set_bold(bold)
-    label = font.render(str(msg), 1, color)
-    pyinit.game_display.blit(label, coordinates)
     
     
 def log(*arg):
@@ -124,7 +116,7 @@ def log(*arg):
                         msg+=", "
                     msg+=str(round(arg[i][j], settings.round_digits))
                 msg += "]"
-        _write_(msg, 15, coordinates)
+        text_renderer.write(msg, 15, coordinates)
 
 def Ray_on_pixel(point2d):
     tr = main_camera.transform.get_global_transform()
