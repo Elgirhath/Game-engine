@@ -1,24 +1,23 @@
 import math
-from lib import Other
-from lib import BasicStructures
-from lib.Vector import Vector
-from lib import Geometry
-from lib.Quaternion import Quaternion
 import time
+
 import pygame
-from lib import Mesh
-from lib.render.world_screen_space_converter import world_to_screen_edge_unclamped
-from lib.render.world_to_screen_face_converter import world_to_screen_face
-from lib.util.world_local_space_converter import Local_to_world_space
+from engine import BasicStructures, Geometry, Mesh, Other, pyinit, settings
+from engine.Geometry import Plane
+from engine.Quaternion import Quaternion
+from engine.Ray import Ray
+from engine.render.world_screen_space_converter import world_to_screen_edge_unclamped
+from engine.render.world_to_screen_face_converter import world_to_screen_face
+from engine.Transform import Transform
+from engine.util.world_local_space_converter import Local_to_world_space
+from engine.Vector import Vector
 
 all_cameras = []
 global main_camera
 
 class Camera():    
     def __init__(self, position, rotation = Quaternion.identity(), scale = (1,1,1), main = True, resolution = (1200, 600)):
-        from lib.Transform import Transform
         self.transform = Transform(self, position, rotation, scale)
-        self.global_transform = None
         if main == True or len(all_cameras)==0:
             for cam in all_cameras:
                 cam.main = False
@@ -38,100 +37,21 @@ class Camera():
         """tg(FOV/2) = tg(FOV_vertical/2)*aspect_ratio"""
         
         self.FOV_vertical = math.degrees(math.atan((math.tan(math.radians(self.FOV/2))/self.aspect_ratio)))*2
-        self.pyramid = View_pyramid(self)
         
         self.middle_pixel = (int(Vector.Scale(main_camera.resolution, (1/2))[0]), int(Vector.Scale(main_camera.resolution, (1/2))[1]))
         self.left_top_pixel = (0,0)
         self.right_top_pixel = (self.resolution[0],0)
         self.left_bottom_pixel = (0, self.resolution[1])
         self.right_bottom_pixel = (self.resolution[0], self.resolution[1])
-        
-class View_pyramid():
-    def __init__(self, cam):
-        self.cam = cam
-    
-    def Top(self):
-        from lib.Geometry import Plane
-        cam = self.cam
-        tr = cam.global_transform
-        vector = tr.forward
-        vector = Vector.Rotate(vector, tr.right, cam.FOV_vertical/2)
-        plane = Plane.From_vectors(vector, tr.right, tr.position)
-        self.top = plane
-        return plane.factors
-    
-    def Bottom(self):
-        from lib.Geometry import Plane
-        cam = self.cam
-        tr = cam.global_transform
-        vector = tr.forward
-        vector = Vector.Rotate(vector, tr.right, -cam.FOV_vertical/2)
-        plane = Plane.From_vectors(tr.right, vector, tr.position)
-        self.bottom = plane
-    
-    def Left(self):
-        from lib.Geometry import Plane
-        cam = main_camera
-        tr = cam.global_transform
-        vector = tr.forward
-        vector = Vector.Rotate(vector, tr.up, cam.FOV/2)
-        plane = Plane.From_vectors(vector, tr.up, tr.position)
-        self.left = plane
-    
-    def Right(self):
-        from lib.Geometry import Plane
-        cam = self.cam
-        tr = cam.global_transform
-        vector = tr.forward
-        vector = Vector.Rotate(vector, tr.up, -cam.FOV/2)
-        plane = Plane.From_vectors(tr.up, vector, tr.position)
-        self.right = plane
-    
-    def Clip(self):
-        from lib.Geometry import Plane
-        cam = self.cam
-        tr = cam.global_transform
+
+    def get_clipping_plane(self):
+        tr = self.transform.get_global_transform()
         normal = tr.forward
-        point = Vector.Add(tr.position, Vector.Scale(tr.forward, cam.clip_min))
-        plane = Plane.From_normal(normal, point)
-        self.clip = plane
-        
-    def Update(self):
-        self.cam.global_transform = self.cam.transform.To_global()
-        self.Top()
-        self.Bottom()
-        self.Left()
-        self.Right()
-        self.Clip()
-        self.all_planes = []
-        self.all_planes.append(self.top)
-        self.all_planes.append(self.bottom)
-        self.all_planes.append(self.left)
-        self.all_planes.append(self.right)
-        self.all_planes.append(self.clip)
-    
-    
-"""****************************  Zmienne globalne i bufory  ***************************************"""
-    
+        point = Vector.Add(tr.position, Vector.Scale(tr.forward, self.clip_min))
+        return Plane.From_normal(normal, point)
 
     
 """****************************  Funkcje  ***************************************"""
-
-
-def Is_visible3d(point):
-    threshold = 0
-    if main_camera.pyramid.top.get_signed_distance_to_point(point) < threshold:
-        return False
-    elif main_camera.pyramid.bottom.get_signed_distance_to_point(point) < threshold:
-        return False
-    elif main_camera.pyramid.left.get_signed_distance_to_point(point) < threshold:
-        return False
-    elif main_camera.pyramid.right.get_signed_distance_to_point(point) < threshold:
-        return False
-    elif main_camera.pyramid.clip.get_signed_distance_to_point(point) < threshold:
-        return False
-    else:
-        return True
 
 def Is_visible2d(point):
     if point[0]<=0 or point[0]>=main_camera.resolution[0] or point[1]<=0 or point[1]>=main_camera.resolution[1]:
@@ -140,7 +60,6 @@ def Is_visible2d(point):
         return True
     
 def Render():
-    from lib import pyinit
     for face in Mesh.all_faces:
         draw_face(face, face.material.color, pyinit.game_display)
 
@@ -167,8 +86,6 @@ def should_face_be_backwards_culled(face):
     return Vector.dot(Vector.Difference(face.vertex[0], Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal) > 0
 
 def _write_(msg, size, coordinates, bold = 0, color = (255,255,255)):
-    import pygame
-    from lib import pyinit
     font = pygame.font.SysFont("Arial", size)
     if bold:
         font.set_bold(bold)
@@ -177,7 +94,6 @@ def _write_(msg, size, coordinates, bold = 0, color = (255,255,255)):
     
     
 def log(*arg):
-    import settings
     if len(arg)<2:
         print("No kind of log function receives ", len(arg), " arguments")
     elif type(arg[len(arg)-1]) is tuple:
@@ -211,10 +127,7 @@ def log(*arg):
         _write_(msg, 15, coordinates)
 
 def Ray_on_pixel(point2d):
-    from lib.Vector import Vector
-    import math
-    from lib.Ray import Ray
-    tr = main_camera.global_transform
+    tr = main_camera.transform.get_global_transform()
     dist_from_mid = Vector.Difference(point2d, main_camera.middle_pixel)
     tg_alfa = math.tan(math.radians(main_camera.FOV/2))*dist_from_mid[0]/(main_camera.resolution[0]/2)
     tg_beta = math.tan(math.radians(main_camera.FOV_vertical/2))*dist_from_mid[1]/(main_camera.resolution[1]/2)

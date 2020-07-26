@@ -1,3 +1,5 @@
+import pygame
+
 class axis():
     def __init__(self, positive, negative):
         self.positive = positive
@@ -20,7 +22,6 @@ def Get_axis(axis_name):
             return 0
 
 def Get_key(key_name):
-    import pygame
     if len(key_name)==1:
         key_name = key_name.lower()
     else:
@@ -61,7 +62,6 @@ def Get_key_up(key_name):
     
     
 def Get_button(button_name):
-    import pygame
     if pygame.key.get_pressed()[eval("pygame.K_" + buttons[button_name])]:
         return 1
     return 0
@@ -73,7 +73,6 @@ def Get_button_up(button_name):
     return Get_key_up(buttons[button_name])
 
 def Mouse_button(button_number):
-    import pygame
     if pygame.mouse.get_pressed()[button_number]:
         return 1
     

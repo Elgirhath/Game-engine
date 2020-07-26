@@ -1,3 +1,5 @@
+import time
+
 def Digits(var):
     i=0
     while var>=1:
@@ -32,7 +34,6 @@ global delta_time
 delta_time = 0
 
 def FPS():
-    import time
     _last_frames_times_.append(time.clock())
     if len(_last_frames_times_)>30:
         _last_frames_times_.pop(0)

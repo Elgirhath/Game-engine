@@ -1,4 +1,4 @@
-from lib.Vector import Vector
+from engine.Vector import Vector
     
 def sort_vertices(point_list):
     if len(point_list) < 3:

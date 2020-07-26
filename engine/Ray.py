@@ -1,4 +1,8 @@
-from lib.util.is_point_in_polygon_resolver import is_point_in_polygon
+from engine.util.is_point_in_polygon_resolver import is_point_in_polygon
+from engine import Mesh
+from engine.Quaternion import Quaternion
+from engine.Vector import Vector
+from engine import Collider
 
 class Ray():
     def __init__(self, origin, direction):
@@ -52,10 +56,6 @@ class Ray():
             return None
     
     def Collide(self, chosen_obj = None, ignore = None):
-        from lib import Mesh
-        from lib.Quaternion import Quaternion
-        from lib.Vector import Vector
-        from lib import Collider
         k_min = None
         collider = None
         for obj in Mesh.objects:

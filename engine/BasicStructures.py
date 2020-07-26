@@ -1,9 +1,10 @@
+from engine.Quaternion import Quaternion
+from engine.Vector import Vector
+from engine.Transform import Transform
+from engine.Mesh import Edge
+
 class Cube():
-    from lib.Quaternion import Quaternion
     def __init__(self, position, rotation = Quaternion(1,(0,0,0)), scale = (1,1,1)):
-        from lib.Vector import Vector
-        from lib.Transform import Transform
-        from lib.Mesh import Edge
         self.transform = Transform(self, position, rotation, scale)
         
         self.edges_init = []

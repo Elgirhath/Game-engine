@@ -1,4 +1,4 @@
-from lib.Vector import Vector
+from engine.Vector import Vector
 
 def convert_to_different_space(vector, component_vector1, component_vector2, component_vector3):
     """

@@ -1,4 +1,4 @@
-from lib.Vector import Vector
+from engine.Vector import Vector
 
 def are_2_points_on_the_same_side_of_line(point1, point2, line_origin, line_end):
     line_vector = Vector.Difference(line_end, line_origin)

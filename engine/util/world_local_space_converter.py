@@ -1,5 +1,5 @@
-from lib.Quaternion import Quaternion
-from lib.Vector import Vector
+from engine.Quaternion import Quaternion
+from engine.Vector import Vector
     
 def World_to_local_space(point, transform):
     point_translated = Vector.Difference(point, transform.position)

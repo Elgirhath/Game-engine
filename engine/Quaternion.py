@@ -1,5 +1,5 @@
 import math
-from lib.Vector import Vector
+from engine.Vector import Vector
 import numpy as np
 import quaternion
 
@@ -36,15 +36,11 @@ class Quaternion():
         Qp = np.quaternion(0, vector[0], vector[1], vector[2])
         Qpu = (q.q * Qp) * q_inversed
         return (Qpu.x, Qpu.y, Qpu.z)
-        
+
     @staticmethod
-    def rotate_face(face, quaternion):
-        from lib import Mesh
-        new_vertices = []
-        for vertex in face.vertex:
-            new_vertices.append(Quaternion.rotate_vector(vertex, quaternion))
-        normal = Quaternion.rotate_vector(face.normal, quaternion)
-        return Mesh.Face(new_vertices, normal)
+    def rotate_vector_by_angle(vector, axis, angle):
+        rotation_quaternion = Quaternion.from_angle_axis(angle, axis)
+        return Quaternion.rotate_vector(vector, rotation_quaternion)
     
     @staticmethod
     def composite_rotations(init_rot_quaternion, additional_rot_quaternion):

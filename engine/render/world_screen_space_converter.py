@@ -1,14 +1,13 @@
-from lib.Mesh import Edge
-from lib.Ray import Ray
-from lib.Geometry import Plane
-from lib.Vector import Vector
-from lib.util.space_converter import convert_to_different_space
+from engine.Mesh import Edge
+from engine.Ray import Ray
+from engine.Geometry import Plane
+from engine.Vector import Vector
+from engine.util.space_converter import convert_to_different_space
 import math
-from lib.render.edge_render_helper import trim_edge_to_visible
     
 def world_to_screen_point(point, camera):
     """Get view of the point on screen"""
-    tr = camera.global_transform
+    tr = camera.transform.get_global_transform()
     
     screen_plane = Plane.From_normal(tr.forward, point)
     screen_middle_point = Vector.Add(tr.position, Vector.Plane_cross_point(tr.position, tr.forward, screen_plane))
@@ -42,18 +41,20 @@ def world_to_screen_edge_unclamped(edge, camera):
     return Edge(origin_pos, end_pos)
 
 def limit_edge_to_camera_clip(edge, camera):
+    clipping_plane = camera.get_clipping_plane()
+
     if is_point_behind_camera_clip(edge.A, camera):
         ray = Ray(edge.B, Vector.Difference(edge.A, edge.B))
-        edge.A = ray.intersect_plane(camera.pyramid.clip)
+        edge.A = ray.intersect_plane(clipping_plane)
 
     if is_point_behind_camera_clip(edge.B, camera):
         ray = Ray(edge.A, Vector.Difference(edge.B, edge.A))
-        edge.B = ray.intersect_plane(camera.pyramid.clip)
+        edge.B = ray.intersect_plane(clipping_plane)
 
     return edge
 
 def is_point_behind_camera_clip(point, camera):
-    tr = camera.global_transform
+    tr = camera.transform.get_global_transform()
     clip_position = Vector.Add(tr.position, Vector.Scale(tr.forward, camera.clip_min))
     return Vector.dot(Vector.Difference(point, clip_position), tr.forward) < 0.0
 

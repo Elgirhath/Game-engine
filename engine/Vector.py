@@ -1,4 +1,7 @@
 import math
+from engine import settings
+from engine.Other import Digits
+
 
 class Vector():
     def divide(vector_1, vector_2):
@@ -75,16 +78,7 @@ class Vector():
         point = Vector.Add(Vector.Scale(vec_origin_to_point, x), origin)
         return point;
         
-    def Rotate(vector, axis, angle):
-        from lib.Quaternion import Quaternion
-        rot_quat = Quaternion.from_angle_axis(angle, axis)
-        rotated_vector = Quaternion.rotate_vector(vector, rot_quat)
-        return rotated_vector
-        
     def Vector_round(vec):
-        from lib import settings
-        from lib.Other import Digits
-
         digit_number = Digits(settings.threshold)
 
         var1 = round(vec[0], digit_number)

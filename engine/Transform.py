@@ -1,10 +1,11 @@
-from lib.Vector import Vector
-from lib.Quaternion import Quaternion
-from lib import Screen
+from engine.Vector import Vector
+from engine.Quaternion import Quaternion
 
 class Transform():
-    def __init__(self, parent, position, rot, scale = (1,1,1)):
-        self.obj = parent
+    def __init__(self, obj, position, rot, scale = (1,1,1)):
+        self.object = obj
+        self.children = set()
+        self.parent = None
     
         self.forward = (1,0,0)
         self.right = (0,-1,0)
@@ -16,23 +17,19 @@ class Transform():
         self.position = position
         self.rotation = rot
         self.scale = scale
+
+        self._calculate_global_tranform()
     
     def Translate(self, vector):
-        self.position = Vector.Add(self.position, vector)
-        
-        self._update_mesh_()
-        
-        if self.obj == Screen.main_camera:
-            self.obj.pyramid.Update()
-            
+        self.Set_pos(Vector.Add(self.position, vector))
             
     def Set_pos(self, position):
         self.position = position
         
         self._update_mesh_()
-        
-        if self.obj == Screen.main_camera:
-            self.obj.pyramid.Update()
+
+        for child in self.children:
+            child.global_transform = child._calculate_global_tranform()
     
     def Rotate(self, angle = 0, axis = (0, 0, 0), rotation = Quaternion(1,(0,0,0))):
         """Rotation of the object"""
@@ -50,9 +47,10 @@ class Transform():
         self.left =  Vector.Scale(self.right, -1)
         self.up =  Quaternion.rotate_vector((0,0,1), self.rotation)
         self.down =  Vector.Scale(self.up, -1)
-        
-        if self.obj == Screen.main_camera:
-            self.obj.pyramid.Update()
+
+    def set_parent(self, parent_transform):
+        self.parent = parent_transform
+        parent_transform.children.add(self)
         
     def Scale(self, scale):
         self.scale = Vector.Scale_by_vector(self.scale, scale)
@@ -65,9 +63,9 @@ class Transform():
         return resultant_global_pos
     
     def _update_mesh_(self):
-        if not 'mesh' in dir(self.obj):
+        if not 'mesh' in dir(self.object):
             return
-        mesh = self.obj.mesh
+        mesh = self.object.mesh
         if 'vertices' in dir(mesh):
             for i in range(0,len(mesh.vertices_init)):
                 vertex = Vector.Scale_by_vector(mesh.vertices_init[i], self.scale)
@@ -88,22 +86,28 @@ class Transform():
                     mesh.faces[i].vertex[k] = self._rotate_vertex_(vertex)
                 mesh.faces[i].normal = Quaternion.rotate_vector(mesh.faces_init[i].normal, self.rotation)
                 
-    def To_global(self, abc = 0):
-        if self.obj.parent:
-            position = Vector.Add(self.obj.parent.transform.position, Quaternion.rotate_vector(self.position, self.obj.parent.transform.rotation))
-            rotation = Quaternion.composite_rotations(self.rotation, self.obj.parent.transform.rotation)
-            scale = Quaternion.rotate_vector(self.scale, self.obj.parent.transform.rotation)
-            obj = self.obj
-            
-            transform = Transform(obj, position, rotation, scale)
-            
-            transform.forward =  Quaternion.rotate_vector(self.forward, self.obj.parent.transform.rotation)
-            transform.backward =  Quaternion.rotate_vector(self.backward, self.obj.parent.transform.rotation)
-            transform.right =  Quaternion.rotate_vector(self.right, self.obj.parent.transform.rotation)
-            transform.left =  Quaternion.rotate_vector(self.left, self.obj.parent.transform.rotation)
-            transform.up =  Quaternion.rotate_vector(self.up, self.obj.parent.transform.rotation)
-            transform.down =  Quaternion.rotate_vector(self.down, self.obj.parent.transform.rotation)
-            
-            return transform
-        else:
-            return self
+    def get_global_transform(self):
+        return self._global_transform
+
+    def _calculate_global_tranform(self):
+        if not self.parent:
+            self._global_transform = self
+            return
+
+        parent_global_transform = self.parent.get_global_transform()
+
+        position = Vector.Add(parent_global_transform.position, Quaternion.rotate_vector(self.position, parent_global_transform.rotation))
+        rotation = Quaternion.composite_rotations(self.rotation, parent_global_transform.rotation)
+        scale = Quaternion.rotate_vector(self.scale, parent_global_transform.rotation)
+        obj = self.object
+        
+        transform = Transform(obj, position, rotation, scale)
+        
+        transform.forward =  Quaternion.rotate_vector(self.forward, parent_global_transform.rotation)
+        transform.backward =  Quaternion.rotate_vector(self.backward, parent_global_transform.rotation)
+        transform.right =  Quaternion.rotate_vector(self.right, parent_global_transform.rotation)
+        transform.left =  Quaternion.rotate_vector(self.left, parent_global_transform.rotation)
+        transform.up =  Quaternion.rotate_vector(self.up, parent_global_transform.rotation)
+        transform.down =  Quaternion.rotate_vector(self.down, parent_global_transform.rotation)
+        
+        self._global_transform = transform

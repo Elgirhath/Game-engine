@@ -1,6 +1,8 @@
-from lib.Vector import Vector
-from lib import Collider
-from lib.Quaternion import Quaternion
+from engine import Collider, Color, Geometry
+from engine.Quaternion import Quaternion
+from engine.Rigidbody import Rigidbody
+from engine.Transform import Transform
+from engine.Vector import Vector
 
 global all_faces
 all_faces = []
@@ -8,9 +10,6 @@ objects = []
 
 class Object():
     def __init__(self, position, rotation = Quaternion(1, (0,0,0)), scale = (1,1,1), mesh = None, collider = None, name = "Default", material = None, parent = None):
-        from lib.Transform import Transform
-        from lib import Color
-        from lib.Rigidbody import Rigidbody
         self.parent = parent
         self.transform = Transform(self, position, rotation, scale)
         if not material:
@@ -82,6 +81,7 @@ class Object():
         
     def Add_camera(self, camera):
         self.camera = camera
+        camera.transform.set_parent(self.transform)
         camera.parent = self
     
     def Destroy(self):
@@ -138,7 +138,6 @@ class Mesh():
             all_faces.append(face)
 
 class Face():
-    from lib import Color
     def __init__(self, vertex_list, normal = (0,0,0), mesh = None, material = Color.default_material):
         self.mesh = mesh
         self.vertex = vertex_list
@@ -150,7 +149,6 @@ class Face():
         self.material = material
     
     def Plane(self):
-        from lib import Geometry
         a = self.normal[0]
         b = self.normal[1]
         c = self.normal[2]
@@ -191,8 +189,6 @@ class Edge():
 
 def _sort_faces_():
     #TODO: FIX THIS
-    import lib.Screen
-    from lib import Geometry
     switch = True
     while switch:
         switch = False
@@ -229,7 +225,7 @@ def _sort_faces_():
                 
 #def _sort_better_():
 #    import Screen
-#    from lib.Ray import Ray
+#    from engine.Ray import Ray
 #    tr = Screen.main_camera.global_transform
 #    sorted_list = []
 #    for face in all_faces:

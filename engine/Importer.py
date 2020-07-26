@@ -1,5 +1,5 @@
-from lib.Quaternion import Quaternion
-from lib import Mesh
+from engine.Quaternion import Quaternion
+from engine import Mesh
 
 def Import_obj(obj_file, position, rotation = Quaternion(1, (0,0,0)), scale = (1,1,1)):
     path = "models/" + obj_file

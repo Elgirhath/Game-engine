@@ -1,4 +1,4 @@
-from lib.Vector import Vector
+from engine.Vector import Vector
 
 class Plane():
     def __init__(self, factor_tupple):

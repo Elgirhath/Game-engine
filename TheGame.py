@@ -1,19 +1,13 @@
+import random
 import sys
 
 import pygame
-from lib import pyinit
-from lib import Other
-from lib.Vector import Vector
-from lib import Screen
-from lib import Color
-from lib import Input
-from lib.Quaternion import Quaternion
-from lib import Mesh
-import random
-from lib import Importer
-from lib import Collider
-from lib import Rigidbody
-from lib.Ray import Ray
+
+from engine import (Collider, Color, Importer, Input, Mesh, Other, Rigidbody,
+                    Screen, pyinit)
+from engine.Quaternion import Quaternion
+from engine.Ray import Ray
+from engine.Vector import Vector
 
 player = Mesh.Object((0,0,0.9))
 cam = Screen.Camera((0,0,0.9), resolution = (1360,768))
@@ -40,8 +34,6 @@ crouch_speed = 0.8
 crouching = False
 
 mouse_sensivity = 0.15
-
-cam.pyramid.Update()
 
 room = Importer.Import_obj("Room.obj", (0,0,0))
 room.Set_material(Color.Material(Color.grey))

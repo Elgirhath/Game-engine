@@ -1,4 +1,8 @@
-from lib.util.world_local_space_converter import Local_to_world_space
+from engine.util.world_local_space_converter import Local_to_world_space
+from engine import Mesh
+from engine.Vector import Vector
+from engine import Other
+from engine.Ray import Ray
 
 class Rigidbody():
     def __init__(self, parent, velocity = (0,0,0), use_gravity = True):
@@ -8,32 +12,23 @@ class Rigidbody():
         self.time_in_air = 0
         
     def Move(self, vector):
-        from lib import Mesh
-        from lib.Vector import Vector
         last_pos = self.parent.transform.position
-        
+
         self.parent.transform.position = Vector.Add(self.parent.transform.position, vector)
         
         if 'collider' in dir(self.parent) and self.parent.collider:
             for obj in Mesh.objects:
                 if obj != self.parent:
                     if self.parent.collider.Collide(obj.collider):
-                        self.parent.transform.position = last_pos
+                        self.parent.transform.Set_pos(last_pos)
                         return
             
-        self.parent.transform._update_mesh_()
-        
-        if 'camera' in dir(self.parent):
-            self.parent.camera.pyramid.Update()
+        self.parent.transform.Set_pos(Vector.Add(last_pos, vector))
             
     def Apply(self):
-        from lib.Vector import Vector
-        from lib import Other
         self.Move(Vector.Scale(self.velocity, Other.delta_time))
         
     def Dist_from_ground(self):
-        from lib.Vector import Vector
-        from lib.Ray import Ray
         ray = Ray(Local_to_world_space(self.parent.collider.center, self.parent.transform), (0,0,-1))
         if ray.Collide(self.parent).point and ray.Collide().point:
             dist_vector = Vector.Difference(ray.Collide().point, ray.Collide(self.parent).point)
@@ -42,10 +37,6 @@ class Rigidbody():
             return None
     
 def Gravity():
-    from lib import Mesh
-    from lib.Vector import Vector
-    from lib import Other
-
     for obj in Mesh.objects:
         if obj.rigidbody:
             if obj.rigidbody.use_gravity:

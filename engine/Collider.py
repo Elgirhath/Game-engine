@@ -1,3 +1,7 @@
+from engine.Vector import Vector
+from engine.Quaternion import Quaternion
+from engine import Mesh
+
 class Sphere_collider():
     def __init__ (self, parent, center, radius):
         self.parent = parent
@@ -5,16 +9,13 @@ class Sphere_collider():
         self.radius = radius
         
     def Collide(self, other):
-        from lib.Vector import Vector
         if type(other) is Sphere_collider:
             if Vector.Distance(other.center, self.center) <= self.radius + other.radius:
                 return True
         return False
             
 class Box_collider():
-    from lib.Quaternion import Quaternion
     def __init__(self, parent, center, size_tuple, rotation = Quaternion(1, (0,0,0))):
-        from lib import Mesh
         self.parent = parent
         self.center = center
         self.size = size_tuple
@@ -55,8 +56,6 @@ class Collision():
         self.point = point
         
 def SAT_collision(collider1, collider2):
-    from lib.Vector import Vector
-    from lib.Quaternion import Quaternion
     points1 = list(collider1.points)
     center1 = Vector.Add(collider1.parent.transform.position, Quaternion.rotate_vector(collider1.center, collider1.parent.transform.rotation))
     for i in range(0, len(points1)):
@@ -119,8 +118,6 @@ def SAT_collision(collider1, collider2):
     return True
 
 def Point_collision(box, point):
-    from lib.Quaternion import Quaternion
-    from lib.Vector import Vector
     box_center = Vector.Add(box.parent.transform.position, Quaternion.rotate_vector(box.center, box.parent.transform.rotation))
     rotated_point = Quaternion.rotate_vector(Vector.Difference(point, box_center), box.parent.transform.rotation.conjugate())
     if abs(rotated_point[0]) > box.size[0]*box.parent.transform.scale[0]:
