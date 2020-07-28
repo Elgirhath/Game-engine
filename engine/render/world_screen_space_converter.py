@@ -30,10 +30,10 @@ def world_to_screen_point(point, camera):
     return (point_right * camera.resolution[0], point_down * camera.resolution[1])
 
 def world_to_screen_edge_unclamped(edge, camera):
-    if is_point_behind_camera_clip(edge.A, camera) and is_point_behind_camera_clip(edge.B, camera):
-        return None
-
     edge = limit_edge_to_camera_clip(edge, camera)
+    
+    if edge == None:
+        return None
 
     origin_pos = world_to_screen_point(edge.A, camera)
     end_pos = world_to_screen_point(edge.B, camera)
@@ -43,11 +43,17 @@ def world_to_screen_edge_unclamped(edge, camera):
 def limit_edge_to_camera_clip(edge, camera):
     clipping_plane = camera.get_clipping_plane()
 
-    if is_point_behind_camera_clip(edge.A, camera):
+    a_behind_clip = is_point_behind_camera_clip(edge.A, camera)
+    b_behind_clip = is_point_behind_camera_clip(edge.B, camera)
+
+    if a_behind_clip and b_behind_clip:
+        return None
+
+    if a_behind_clip:
         ray = Ray(edge.B, Vector.Difference(edge.A, edge.B))
         edge.A = ray.intersect_plane(clipping_plane)
 
-    if is_point_behind_camera_clip(edge.B, camera):
+    if b_behind_clip:
         ray = Ray(edge.A, Vector.Difference(edge.B, edge.A))
         edge.B = ray.intersect_plane(clipping_plane)
 
