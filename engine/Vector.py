@@ -31,10 +31,10 @@ class Vector():
             return (vector[0]*scalar, vector[1]*scalar, vector[2]*scalar)
     
     def Add(vector_1, vector_2):
-        if len(vector_1) == 2:
-            return (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1])
-        else:
-            return (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1], vector_1[2] + vector_2[2])
+        return (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1], vector_1[2] + vector_2[2])
+
+    def Add2d(vector_1, vector_2):
+        return (vector_1[0] + vector_2[0], vector_1[1] + vector_2[1])
     
     def Scale_div(vector_1, vector_2):
         if len(vector_1) == 3:
@@ -64,10 +64,10 @@ class Vector():
         return vector_1
     
     def Difference(vector_1, vector_2):
-        if len(vector_1) == 2:
-            return (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1])
-        else:
-            return (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1], vector_1[2] - vector_2[2])
+        return (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1], vector_1[2] - vector_2[2])
+            
+    def Difference2d(vector_1, vector_2):
+        return (vector_1[0]-vector_2[0], vector_1[1] - vector_2[1])
     
     def Homothety(point, origin, scalar):
         """

@@ -198,7 +198,7 @@ class Gun():
         rect = pygame.Surface(rect_size)
         rect.set_alpha(128)
         rect.fill(Color.black)
-        rect_pos = Vector.Difference(cam.resolution, rect_size)
+        rect_pos = Vector.Difference2d(cam.resolution, rect_size)
         horiz_space = int((rect_size[0])/(Gun.magazine_size+1)*0.7)
         vert_pos = rect_size[1]/2 - Gun.bullet_size[1]/2
         ammo = Gun.current_ammo

@@ -79,7 +79,7 @@ def log(*arg):
 def Ray_on_pixel(point2d):
     cam = camera.main_camera
     tr = cam.transform.get_global_transform()
-    dist_from_mid = Vector.Difference(point2d, cam.middle_pixel)
+    dist_from_mid = Vector.Difference2d(point2d, cam.middle_pixel)
     tg_alfa = math.tan(math.radians(cam.FOV/2))*dist_from_mid[0]/(cam.resolution[0]/2)
     tg_beta = math.tan(math.radians(cam.FOV_vertical/2))*dist_from_mid[1]/(cam.resolution[1]/2)
     direction = Vector.Add(Vector.Add(tr.forward, Vector.Scale(tr.right, tg_alfa)), Vector.Scale(tr.down, tg_beta))
