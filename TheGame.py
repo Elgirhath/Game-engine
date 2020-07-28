@@ -3,20 +3,21 @@ import sys
 
 import pygame
 
-from engine import (Collider, Color, Importer, Input, Mesh, Other, Rigidbody,
-                    Screen, pyinit)
+from engine import (Collider, Color, Importer, Input, Mesh, Other, Rigidbody, pyinit)
 from engine.Quaternion import Quaternion
 from engine.Ray import Ray
-from engine.Vector import Vector
 from engine.render import text_renderer
+from engine.Vector import Vector
+from engine.render import Screen
+from engine.render.camera import camera
 
 player = Mesh.Object((0,0,0.9))
-cam = Screen.Camera((0,0,0.9), resolution = (1360,768))
+cam = camera.Camera((0,0,0.9), resolution = (1360,768))
 player.Add_camera(cam)
 player.collider = Collider.Box_collider(player, (0, 0, 0), (0.1, 0.1, 0.85))
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
-pyinit.init(Screen.main_camera.resolution, "The game", "window")
+pyinit.init(camera.main_camera.resolution, "The game", "window")
 pygame.mouse.set_visible(False)
 pygame.event.set_grab(True)
 game_exit=False;

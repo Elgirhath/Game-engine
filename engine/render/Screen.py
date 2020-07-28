@@ -12,60 +12,18 @@ from engine.Transform import Transform
 from engine.util.world_local_space_converter import Local_to_world_space
 from engine.Vector import Vector
 from engine.render import text_renderer
-
-all_cameras = []
-global main_camera
-
-class Camera():    
-    def __init__(self, position, rotation = Quaternion.identity(), scale = (1,1,1), main = True, resolution = (1200, 600)):
-        self.transform = Transform(self, position, rotation, scale)
-        if main == True or len(all_cameras)==0:
-            for cam in all_cameras:
-                cam.main = False
-            self.main = True
-        all_cameras.append(self)
-        global main_camera
-        main_camera = self
-        
-        self.parent = None
-        
-        self.clip_min = 0.1
-        self.clip_max = 100
-        self.resolution = resolution
-        self.aspect_ratio = resolution[0]/resolution[1]
-        self.FOV = 120
-        
-        # tg(FOV/2) = tg(FOV_vertical/2)*aspect_ratio
-        self.FOV_vertical = math.degrees(math.atan((math.tan(math.radians(self.FOV/2))/self.aspect_ratio)))*2
-        
-        self.middle_pixel = (int(Vector.Scale(main_camera.resolution, (1/2))[0]), int(Vector.Scale(main_camera.resolution, (1/2))[1]))
-        self.left_top_pixel = (0,0)
-        self.right_top_pixel = (self.resolution[0],0)
-        self.left_bottom_pixel = (0, self.resolution[1])
-        self.right_bottom_pixel = (self.resolution[0], self.resolution[1])
-
-    def get_clipping_plane(self):
-        tr = self.transform.get_global_transform()
-        normal = tr.forward
-        point = Vector.Add(tr.position, Vector.Scale(tr.forward, self.clip_min))
-        return Plane.From_normal(normal, point)
-
+from engine.render.camera import camera
     
 """****************************  Funkcje  ***************************************"""
 
 def Is_visible2d(point):
-    return point[0] > 0 and point[0] < main_camera.resolution[0] and point[1] > 0 and point[1] < main_camera.resolution[1]
+    return point[0] > 0 and point[0] < camera.main_camera.resolution[0] and point[1] > 0 and point[1] < camera.main_camera.resolution[1]
     
 def Render():
     for face in Mesh.all_faces:
         draw_face(face, face.material.color, pyinit.game_display)
 
     text_renderer.render()
-
-def draw_mesh(mesh, color, display):
-    for face in mesh.faces:
-        if Vector.dot(Vector.Difference(face.vertex[0], Vector.Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal)<=0:
-            draw_face(face, color, display)
 
 def draw_edge(edge, color, display):
     edge2d = world_to_screen_edge_unclamped(edge, main_camera)
@@ -76,13 +34,13 @@ def draw_face(face, color, display):
     if should_face_be_backwards_culled(face):
         return
 
-    vertices = world_to_screen_face(face, main_camera)
+    vertices = world_to_screen_face(face, camera.main_camera)
 
     if vertices:
         pygame.draw.polygon(display, color, vertices)
 
 def should_face_be_backwards_culled(face):
-    return Vector.dot(Vector.Difference(face.vertex[0], Local_to_world_space(main_camera.transform.position, main_camera.parent.transform)), face.normal) > 0
+    return Vector.dot(Vector.Difference(face.vertex[0], Local_to_world_space(camera.main_camera.transform.position, camera.main_camera.parent.transform)), face.normal) > 0
     
     
 def log(*arg):
@@ -119,10 +77,11 @@ def log(*arg):
         text_renderer.write(msg, 15, coordinates)
 
 def Ray_on_pixel(point2d):
-    tr = main_camera.transform.get_global_transform()
-    dist_from_mid = Vector.Difference(point2d, main_camera.middle_pixel)
-    tg_alfa = math.tan(math.radians(main_camera.FOV/2))*dist_from_mid[0]/(main_camera.resolution[0]/2)
-    tg_beta = math.tan(math.radians(main_camera.FOV_vertical/2))*dist_from_mid[1]/(main_camera.resolution[1]/2)
+    cam = camera.main_camera
+    tr = cam.transform.get_global_transform()
+    dist_from_mid = Vector.Difference(point2d, cam.middle_pixel)
+    tg_alfa = math.tan(math.radians(cam.FOV/2))*dist_from_mid[0]/(cam.resolution[0]/2)
+    tg_beta = math.tan(math.radians(cam.FOV_vertical/2))*dist_from_mid[1]/(cam.resolution[1]/2)
     direction = Vector.Add(Vector.Add(tr.forward, Vector.Scale(tr.right, tg_alfa)), Vector.Scale(tr.down, tg_beta))
     direction = Vector.Normalize(direction)
     ray = Ray(tr.position, direction)

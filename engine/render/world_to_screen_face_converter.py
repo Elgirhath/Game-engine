@@ -1,7 +1,7 @@
 from engine.Mesh import Face
 from engine.render.world_screen_space_converter import world_to_screen_edge_unclamped, limit_edge_to_screen
 from engine import Geometry
-from engine import Screen
+from engine.render import Screen
 from engine.util.is_point_in_polygon_resolver import is_point_in_polygon
 from engine import Input
 from engine.render.vertex_sorter import sort_vertices
