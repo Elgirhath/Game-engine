@@ -1,7 +1,7 @@
 from engine.Mesh import Edge
 from engine.Ray import Ray
 from engine.Geometry import Plane
-from engine.Vector import Vector
+from engine.math import vector3
 from engine.util.space_converter import convert_to_different_space
 import math
     
@@ -10,21 +10,21 @@ def world_to_screen_point(point, camera):
     tr = camera.transform.get_global_transform()
     
     screen_plane = Plane.From_normal(tr.forward, point)
-    screen_middle_point = Vector.Add(tr.position, Vector.Plane_cross_point(tr.position, tr.forward, screen_plane))
+    screen_middle_point = Ray(tr.position, tr.forward).intersect_plane(screen_plane)
         
-    screen_width = math.tan(math.radians(camera.FOV/2))*Vector.Magnitude(Vector.Difference(screen_middle_point, tr.position))*2
+    screen_width = math.tan(math.radians(camera.FOV/2))*vector3.magnitude(vector3.subtract(screen_middle_point, tr.position))*2
     screen_height = screen_width / camera.aspect_ratio
     
-    point_in_camera_space = convert_to_different_space(Vector.Difference(point, screen_middle_point), tr.right, tr.down, tr.forward)
+    point_in_camera_space = convert_to_different_space(vector3.subtract(point, screen_middle_point), tr.right, tr.down, tr.forward)
 
-    point_right_vector = Vector.Add(Vector.Scale(tr.right, screen_width/2), Vector.Scale(tr.right, point_in_camera_space[0]))
-    point_down_vector = Vector.Add(Vector.Scale(tr.down, screen_height/2), Vector.Scale(tr.down, point_in_camera_space[1]))
-    point_right = Vector.Magnitude(point_right_vector)/screen_width
-    point_down = Vector.Magnitude(point_down_vector)/screen_height
-    scale_right = Vector.Scale_div(point_right_vector, tr.right)
+    point_right_vector = vector3.add(vector3.scale(tr.right, screen_width/2), vector3.scale(tr.right, point_in_camera_space[0]))
+    point_down_vector = vector3.add(vector3.scale(tr.down, screen_height/2), vector3.scale(tr.down, point_in_camera_space[1]))
+    point_right = vector3.magnitude(point_right_vector)/screen_width
+    point_down = vector3.magnitude(point_down_vector)/screen_height
+    scale_right = vector3.scale_div(point_right_vector, tr.right)
     if scale_right<0:
         point_right=-point_right
-    scale_down = Vector.Scale_div(point_down_vector, tr.down)
+    scale_down = vector3.scale_div(point_down_vector, tr.down)
     if scale_down<0:
         point_down=-point_down
     return (point_right * camera.resolution[0], point_down * camera.resolution[1])
@@ -50,19 +50,19 @@ def limit_edge_to_camera_clip(edge, camera):
         return None
 
     if a_behind_clip:
-        ray = Ray(edge.B, Vector.Difference(edge.A, edge.B))
+        ray = Ray(edge.B, vector3.subtract(edge.A, edge.B))
         edge.A = ray.intersect_plane(clipping_plane)
 
     if b_behind_clip:
-        ray = Ray(edge.A, Vector.Difference(edge.B, edge.A))
+        ray = Ray(edge.A, vector3.subtract(edge.B, edge.A))
         edge.B = ray.intersect_plane(clipping_plane)
 
     return edge
 
 def is_point_behind_camera_clip(point, camera):
     tr = camera.transform.get_global_transform()
-    clip_position = Vector.Add(tr.position, Vector.Scale(tr.forward, camera.clip_min))
-    return Vector.dot(Vector.Difference(point, clip_position), tr.forward) < 0.0
+    clip_position = vector3.add(tr.position, vector3.scale(tr.forward, camera.clip_min))
+    return vector3.dot(vector3.subtract(point, clip_position), tr.forward) < 0.0
 
 def limit_edge_to_screen(edge, resolution):
     if edge.A[0] < 0.0:

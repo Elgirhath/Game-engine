@@ -1,4 +1,4 @@
-from engine.Vector import Vector
+from engine.math import vector2
 import math
     
 def sort_vertices(point_list):
@@ -7,7 +7,7 @@ def sort_vertices(point_list):
 
     center = get_center_of_mass(point_list)
     
-    point_list.sort(key=lambda point: math.atan2(*Vector.Difference2d(point, center)))
+    point_list.sort(key=lambda point: math.atan2(*vector2.subtract(point, center)))
 
     return point_list
 

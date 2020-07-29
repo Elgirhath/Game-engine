@@ -1,7 +1,7 @@
 from engine.util.is_point_in_polygon_resolver import is_point_in_polygon
 from engine import Mesh
 from engine.Quaternion import Quaternion
-from engine.Vector import Vector
+from engine.math import vector3
 from engine import Collider
 
 class Ray():
@@ -71,8 +71,8 @@ class Ray():
                     if not chosen_obj and Collider.Point_collision(obj.collider, self.origin):
                         continue
                     
-                    global_box_center = Vector.Add(Quaternion.rotate_vector(obj.collider.center, obj.transform.rotation), obj.transform.position)
-                    global_difference = Vector.Difference(self.origin, global_box_center)
+                    global_box_center = vector3.add(Quaternion.rotate_vector(obj.collider.center, obj.transform.rotation), obj.transform.position)
+                    global_difference = vector3.subtract(self.origin, global_box_center)
                     local_ray_origin = Quaternion.rotate_vector(global_difference, obj.transform.rotation.conjugate())
                     local_ray_dir = Quaternion.rotate_vector(self.direction, obj.transform.rotation.conjugate())
                     
@@ -82,7 +82,7 @@ class Ray():
                         if local_ray_dir[i]!=0:
                             k = (-size[i] - local_ray_origin[i])/local_ray_dir[i]
                             if k>=0:
-                                intersection = Vector.Add(local_ray_origin, Vector.Scale(local_ray_dir, k))
+                                intersection = vector3.add(local_ray_origin, vector3.scale(local_ray_dir, k))
                                 inside = True
                                 for j in range(0, 3):
                                     if j!=i and abs(intersection[j])>size[j]:
@@ -94,7 +94,7 @@ class Ray():
                                         
                             k = (size[i] - local_ray_origin[i])/local_ray_dir[i]
                             if k>=0:
-                                intersection = Vector.Add(local_ray_origin, Vector.Scale(local_ray_dir, k))
+                                intersection = vector3.add(local_ray_origin, vector3.scale(local_ray_dir, k))
                                 inside = True
                                 for j in range(0, 3):
                                     if j!=i and abs(intersection[j])>size[j]:
@@ -105,7 +105,7 @@ class Ray():
                                         collider = obj.collider
                                     
         if k_min != None and collider != None:
-            point = Vector.Add(self.origin, Vector.Scale(self.direction, k_min))
+            point = vector3.add(self.origin, vector3.scale(self.direction, k_min))
         else:
             point = None
             

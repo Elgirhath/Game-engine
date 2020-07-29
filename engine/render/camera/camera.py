@@ -1,6 +1,6 @@
 from engine.Quaternion import Quaternion
 from engine.Transform import Transform
-from engine.Vector import Vector
+from engine.math import vector3, vector2
 from engine.Geometry import Plane
 import math
 
@@ -29,7 +29,7 @@ class Camera():
         # tg(FOV/2) = tg(FOV_vertical/2)*aspect_ratio
         self.FOV_vertical = math.degrees(math.atan((math.tan(math.radians(self.FOV/2))/self.aspect_ratio)))*2
         
-        self.middle_pixel = (int(Vector.Scale(main_camera.resolution, (1/2))[0]), int(Vector.Scale(main_camera.resolution, (1/2))[1]))
+        self.middle_pixel = (int(vector2.scale(main_camera.resolution, (1/2))[0]), int(vector2.scale(main_camera.resolution, (1/2))[1]))
         self.left_top_pixel = (0,0)
         self.right_top_pixel = (self.resolution[0],0)
         self.left_bottom_pixel = (0, self.resolution[1])
@@ -71,7 +71,7 @@ class ClippingPlaneManager():
     def recalculate(self):
         tr = self.camera.transform.get_global_transform()
         normal = tr.forward
-        point = Vector.Add(tr.position, Vector.Scale(tr.forward, self.camera.clip_min))
+        point = vector3.add(tr.position, vector3.scale(tr.forward, self.camera.clip_min))
         self.clipping_plane = Plane.From_normal(normal, point)
 
         self.previous_position = tr.position

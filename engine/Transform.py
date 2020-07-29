@@ -1,4 +1,4 @@
-from engine.Vector import Vector
+from engine.math import vector3
 from engine.Quaternion import Quaternion
 
 class Transform():
@@ -21,7 +21,7 @@ class Transform():
         self._calculate_global_tranform()
     
     def Translate(self, vector):
-        self.Set_pos(Vector.Add(self.position, vector))
+        self.Set_pos(vector3.add(self.position, vector))
             
     def Set_pos(self, position):
         self.position = position
@@ -42,24 +42,24 @@ class Transform():
         self._update_mesh_()
             
         self.forward =  Quaternion.rotate_vector((1,0,0), self.rotation)
-        self.backward =  Vector.Scale(self.forward, -1)
+        self.backward =  vector3.scale(self.forward, -1)
         self.right =  Quaternion.rotate_vector((0,-1,0), self.rotation)
-        self.left =  Vector.Scale(self.right, -1)
+        self.left =  vector3.scale(self.right, -1)
         self.up =  Quaternion.rotate_vector((0,0,1), self.rotation)
-        self.down =  Vector.Scale(self.up, -1)
+        self.down =  vector3.scale(self.up, -1)
 
     def set_parent(self, parent_transform):
         self.parent = parent_transform
         parent_transform.children.add(self)
         
-    def Scale(self, scale):
-        self.scale = Vector.Scale_by_vector(self.scale, scale)
+    def scale(self, scale):
+        self.scale = vector3.scale_by_vector(self.scale, scale)
         
         self._update_mesh_()
         
     def _rotate_vertex_(self, vertex_init):
         resultant_local_pos = Quaternion.rotate_vector(vertex_init, self.rotation)
-        resultant_global_pos = Vector.Add(resultant_local_pos, self.position)
+        resultant_global_pos = vector3.add(resultant_local_pos, self.position)
         return resultant_global_pos
     
     def _update_mesh_(self):
@@ -68,21 +68,21 @@ class Transform():
         mesh = self.object.mesh
         if 'vertices' in dir(mesh):
             for i in range(0,len(mesh.vertices_init)):
-                vertex = Vector.Scale_by_vector(mesh.vertices_init[i], self.scale)
+                vertex = vector3.scale_by_vector(mesh.vertices_init[i], self.scale)
                 mesh.vertices[i] = self._rotate_vertex_(vertex)
                 
                 
         if 'edges' in dir(mesh):
             for i in range(0,len(mesh.edges_init)):
-                vertex_a = Vector.Scale_by_vector(mesh.edges_init[i].A, self.scale)
-                vertex_b = Vector.Scale_by_vector(mesh.edges_init[i].B, self.scale)
+                vertex_a = vector3.scale_by_vector(mesh.edges_init[i].A, self.scale)
+                vertex_b = vector3.scale_by_vector(mesh.edges_init[i].B, self.scale)
                 mesh.edges[i].A = self._rotate_vertex_(vertex_a)
                 mesh.edges[i].B = self._rotate_vertex_(vertex_b)
                 
         if 'faces' in dir(mesh):
             for i in range(0,len(mesh.faces_init)):
                 for k in range(0, len(mesh.faces_init[i].vertex)):
-                    vertex = Vector.Scale_by_vector(mesh.faces_init[i].vertex[k], self.scale)
+                    vertex = vector3.scale_by_vector(mesh.faces_init[i].vertex[k], self.scale)
                     mesh.faces[i].vertex[k] = self._rotate_vertex_(vertex)
                 mesh.faces[i].normal = Quaternion.rotate_vector(mesh.faces_init[i].normal, self.rotation)
                 
@@ -96,7 +96,7 @@ class Transform():
 
         parent_global_transform = self.parent.get_global_transform()
 
-        position = Vector.Add(parent_global_transform.position, Quaternion.rotate_vector(self.position, parent_global_transform.rotation))
+        position = vector3.add(parent_global_transform.position, Quaternion.rotate_vector(self.position, parent_global_transform.rotation))
         rotation = Quaternion.composite_rotations(self.rotation, parent_global_transform.rotation)
         scale = Quaternion.rotate_vector(self.scale, parent_global_transform.rotation)
         obj = self.object

@@ -10,7 +10,7 @@ from engine.render.world_screen_space_converter import world_to_screen_edge_uncl
 from engine.render.world_to_screen_face_converter import world_to_screen_face
 from engine.Transform import Transform
 from engine.util.world_local_space_converter import Local_to_world_space
-from engine.Vector import Vector
+from engine.math import vector3, vector2
 from engine.render import text_renderer
 from engine.render.camera import camera
     
@@ -40,7 +40,7 @@ def draw_face(face, color, display):
         pygame.draw.polygon(display, color, vertices)
 
 def should_face_be_backwards_culled(face):
-    return Vector.dot(Vector.Difference(face.vertex[0], Local_to_world_space(camera.main_camera.transform.position, camera.main_camera.parent.transform)), face.normal) > 0
+    return vector3.dot(vector3.subtract(face.vertex[0], Local_to_world_space(camera.main_camera.transform.position, camera.main_camera.parent.transform)), face.normal) > 0
     
     
 def log(*arg):
@@ -79,15 +79,15 @@ def log(*arg):
 def Ray_on_pixel(point2d):
     cam = camera.main_camera
     tr = cam.transform.get_global_transform()
-    dist_from_mid = Vector.Difference2d(point2d, cam.middle_pixel)
+    dist_from_mid = vector2.subtract(point2d, cam.middle_pixel)
     tg_alfa = math.tan(math.radians(cam.FOV/2))*dist_from_mid[0]/(cam.resolution[0]/2)
     tg_beta = math.tan(math.radians(cam.FOV_vertical/2))*dist_from_mid[1]/(cam.resolution[1]/2)
-    direction = Vector.Add(Vector.Add(tr.forward, Vector.Scale(tr.right, tg_alfa)), Vector.Scale(tr.down, tg_beta))
-    direction = Vector.Normalize(direction)
+    direction = vector3.add(vector3.add(tr.forward, vector3.scale(tr.right, tg_alfa)), vector3.scale(tr.down, tg_beta))
+    direction = vector3.normalize(direction)
     ray = Ray(tr.position, direction)
     return ray
 
 def Screen_to_world(point2d, distance):
     ray = Ray_on_pixel(point2d)
-    point = Vector.Add(ray.origin, Vector.Scale(ray.direction, distance))
+    point = vector3.add(ray.origin, vector3.scale(ray.direction, distance))
     return point

@@ -1,4 +1,4 @@
-from engine.Vector import Vector
+from engine.math import vector3
 
     
 def is_point_in_polygon(point, vertex_list):

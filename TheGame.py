@@ -7,13 +7,13 @@ from engine import (Collider, Color, Importer, Input, Mesh, Other, Rigidbody, py
 from engine.Quaternion import Quaternion
 from engine.Ray import Ray
 from engine.render import text_renderer
-from engine.Vector import Vector
+from engine.math import vector3, vector2
 from engine.render import Screen
 from engine.render.camera import camera
 
 player = Mesh.Object((0,0,0.9))
 cam = camera.Camera((0,0,0.9), resolution = (1360,768))
-player.Add_camera(cam)
+player.add_camera(cam)
 player.collider = Collider.Box_collider(player, (0, 0, 0), (0.1, 0.1, 0.85))
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
@@ -186,19 +186,19 @@ class Gun():
     current_ammo = 10
     bullet_icon = pygame.image.load("ui/bullet_icon.png").convert_alpha()
     bullet_size = bullet_icon.get_rect().size
-    bullet_icon = pygame.transform.scale(bullet_icon, (int(Vector.Scale(bullet_size, 0.1)[0]), int(Vector.Scale(bullet_size, 0.1)[1])))
-    bullet_size = (int(Vector.Scale(bullet_size, 0.1)[0]), int(Vector.Scale(bullet_size, 0.1)[1]))
+    bullet_icon = pygame.transform.scale(bullet_icon, (int(vector2.scale(bullet_size, 0.1)[0]), int(vector2.scale(bullet_size, 0.1)[1])))
+    bullet_size = (int(vector2.scale(bullet_size, 0.1)[0]), int(vector2.scale(bullet_size, 0.1)[1]))
     bullet_icon_empty = pygame.image.load("ui/bullet_icon_empty.png").convert_alpha()
     bullet_size_empty = bullet_icon_empty.get_rect().size
-    bullet_icon_empty = pygame.transform.scale(bullet_icon_empty, (int(Vector.Scale(bullet_size_empty, 0.1)[0]), int(Vector.Scale(bullet_size_empty, 0.1)[1])))
-    bullet_size_empty = (int(Vector.Scale(bullet_size_empty, 0.1)[0]), int(Vector.Scale(bullet_size_empty, 0.1)[1]))
+    bullet_icon_empty = pygame.transform.scale(bullet_icon_empty, (int(vector2.scale(bullet_size_empty, 0.1)[0]), int(vector2.scale(bullet_size_empty, 0.1)[1])))
+    bullet_size_empty = (int(vector2.scale(bullet_size_empty, 0.1)[0]), int(vector2.scale(bullet_size_empty, 0.1)[1]))
     
     def Ammo_rect():
         rect_size = (int(cam.resolution[0]*0.4), int(cam.resolution[1]*0.15))
         rect = pygame.Surface(rect_size)
         rect.set_alpha(128)
         rect.fill(Color.black)
-        rect_pos = Vector.Difference2d(cam.resolution, rect_size)
+        rect_pos = vector2.subtract(cam.resolution, rect_size)
         horiz_space = int((rect_size[0])/(Gun.magazine_size+1)*0.7)
         vert_pos = rect_size[1]/2 - Gun.bullet_size[1]/2
         ammo = Gun.current_ammo
@@ -258,13 +258,13 @@ while not game_exit:
             mouse_move = event.rel
 
     
-    if pyinit.display_mode == "window" and Vector.Magnitude(mouse_move)<2:
+    if pyinit.display_mode == "window" and vector2.magnitude(mouse_move)<2:
         mouse_move = (0,0)
             
     cam.transform.Rotate(mouse_sensivity*mouse_move[1], cam.transform.left)
     cam.transform.Rotate(mouse_sensivity*mouse_move[0], (0, 0, -1))
     
-    player_move = Vector.Normalize((Input.Get_axis('horizontal'), Input.Get_axis('vertical')))
+    player_move = vector2.normalize((Input.Get_axis('horizontal'), Input.Get_axis('vertical')))
 
     if Input.Get_key_down("lctrl"):
         if crouching:
@@ -284,15 +284,15 @@ while not game_exit:
     else:
         move_speed = crouch_speed
 
-    right_move_vec = Vector.Scale(cam.transform.right, player_move[0])
-    forward_move_vec = Vector.Scale(cam.transform.forward, player_move[1])
-    move_vec = (Vector.Add(right_move_vec, forward_move_vec)[0], Vector.Add(right_move_vec, forward_move_vec)[1], 0)
-    move_vec = Vector.Normalize(move_vec)
-    move_vec = Vector.Scale(move_vec, move_speed)
+    right_move_vec = vector3.scale(cam.transform.right, player_move[0])
+    forward_move_vec = vector3.scale(cam.transform.forward, player_move[1])
+    move_vec = (vector3.add(right_move_vec, forward_move_vec)[0], vector3.add(right_move_vec, forward_move_vec)[1], 0)
+    move_vec = vector3.normalize(move_vec)
+    move_vec = vector3.scale(move_vec, move_speed)
     
-    player.rigidbody.Move(Vector.Scale(move_vec, Other.delta_time))
+    player.rigidbody.Move(vector3.scale(move_vec, Other.delta_time))
     
-    if Vector.Magnitude(move_vec)>0 and step_timer<=0:
+    if vector3.magnitude(move_vec)>0 and step_timer<=0:
         if player.rigidbody.Dist_from_ground() and player.rigidbody.Dist_from_ground() <=0.05:
             if move_speed == walk_speed:
                 step_channel.play(footstep)
@@ -311,7 +311,7 @@ while not game_exit:
         if crouching:
             crouching = False
             cam.transform.Translate((0,0,0.9))
-        player.rigidbody.velocity = Vector.Add(player.rigidbody.velocity, (0,0,3))
+        player.rigidbody.velocity = vector3.add(player.rigidbody.velocity, (0,0,3))
         
     if Input.Mouse_button_down(0):
         if Gun.current_ammo>0:
@@ -354,7 +354,7 @@ while not game_exit:
             Reset_targets()
         for target in all_targets:
             if target.dir:
-                target.obj.transform.Translate(Vector.Scale(target.dir, Other.delta_time))
+                target.obj.transform.Translate(vector3.scale(target.dir, Other.delta_time))
                 if target.obj.transform.position[0]>9:
                     target.dir = (-target.speed, 0, 0)
                 if target.obj.transform.position[0]<-9:
@@ -388,7 +388,7 @@ while not game_exit:
         text = "Trafiłeś " + str(target_count) + " tarcz!"
         text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.3))), 2, Color.orange)
 
-    if Vector.Distance(player.transform.position, button1.transform.position) < 1:
+    if vector3.distance(player.transform.position, button1.transform.position) < 1:
         font = pygame.font.SysFont("Arial", 20)
         text = "Wciśnij E, aby zresetować tarcze"
         text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)
@@ -396,7 +396,7 @@ while not game_exit:
             Reset_targets()
             
 
-    if Vector.Distance(player.transform.position, button3.transform.position) < 1:
+    if vector3.distance(player.transform.position, button3.transform.position) < 1:
         font = pygame.font.SysFont("Arial", 20)
         if not training:
             text = "Wciśnij E, aby rozpocząć trening"
@@ -411,7 +411,7 @@ while not game_exit:
                 target_sound.stop()
                 training = False
 
-    if Vector.Distance(player.transform.position, guns.transform.position) < 2 and Gun.current_ammo<Gun.magazine_size:
+    if vector3.distance(player.transform.position, guns.transform.position) < 2 and Gun.current_ammo<Gun.magazine_size:
         font = pygame.font.SysFont("Arial", 20)
         text = "Wciśnij R, aby uzupełnić amunicję"
         text_renderer.write(text, 20, (int(cam.resolution[0]*0.5) - int(font.size(text)[0]/2), int(cam.resolution[1]*(0.7))), 2, Color.orange)

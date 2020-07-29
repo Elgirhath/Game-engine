@@ -2,7 +2,7 @@ from engine import Collider, Color, Geometry
 from engine.Quaternion import Quaternion
 from engine.Rigidbody import Rigidbody
 from engine.Transform import Transform
-from engine.Vector import Vector
+from engine.math import vector3
 
 global all_faces
 all_faces = []
@@ -79,7 +79,7 @@ class Object():
         self.mesh = mesh
         self.mesh.parent = self
         
-    def Add_camera(self, camera):
+    def add_camera(self, camera):
         self.camera = camera
         camera.transform.set_parent(self.transform)
         camera.parent = self
@@ -156,14 +156,14 @@ class Face():
         return Geometry.Plane((a,b,c,d))
     
     def Calculate_normal(self, inverted = False):
-        plane_vector1 = Vector.Difference(self.vertex[0], self.vertex[1])
-        plane_vector2 = Vector.Difference(self.vertex[1], self.vertex[2])
-        normal = Vector.cross(plane_vector1, plane_vector2)
-        normal = Vector.Normalize(normal)
+        plane_vector1 = vector3.subtract(self.vertex[0], self.vertex[1])
+        plane_vector2 = vector3.subtract(self.vertex[1], self.vertex[2])
+        normal = vector3.cross(plane_vector1, plane_vector2)
+        normal = vector3.normalize(normal)
         if not inverted:
             return normal
         else:
-            return Vector.Scale(normal, -1)
+            return vector3.scale(normal, -1)
 
     def get_edges(self):
         edges = []
@@ -193,26 +193,26 @@ def _sort_faces_():
     while switch:
         switch = False
         for i in range(0, len(all_faces)-1):
-            if Vector.dot(all_faces[i].normal, Screen.main_camera.global_transform.forward)<0:
+            if vector3.dot(all_faces[i].normal, Screen.main_camera.global_transform.forward)<0:
                 vc = all_faces[i].normal
             else:
-                vc = Vector.Scale(all_faces[i].normal, -1)
+                vc = vector3.scale(all_faces[i].normal, -1)
             above = True
             below = True
             for vertex in all_faces[i+1].vertex:
-                if Geometry.Axis_view(vc, Vector.Difference(vertex, all_faces[i].vertex[0]))>=0:
+                if Geometry.Axis_view(vc, vector3.subtract(vertex, all_faces[i].vertex[0]))>=0:
                     below = False
                 else:
                     above = False
             if not above and not below:
-                if Vector.dot(all_faces[i+1].normal, Screen.main_camera.global_transform.forward)<0:
+                if vector3.dot(all_faces[i+1].normal, Screen.main_camera.global_transform.forward)<0:
                     vc = all_faces[i+1].normal
                 else:
-                    vc = Vector.Scale(all_faces[i+1].normal, -1)
+                    vc = vector3.scale(all_faces[i+1].normal, -1)
                 above = True
                 below = True
                 for vertex in all_faces[i].vertex:
-                    if Geometry.Axis_view(vc, Vector.Difference(vertex, all_faces[i+1].vertex[0]))>=0:
+                    if Geometry.Axis_view(vc, vector3.subtract(vertex, all_faces[i+1].vertex[0]))>=0:
                         below = False
                     else:
                         above = False
@@ -230,12 +230,12 @@ def _sort_faces_():
 #    sorted_list = []
 #    for face in all_faces:
 #        for vertex in face.vertex:
-#            distance = Vector.Distance(vertex, tr.position)
-#            ray_dir = Vector.Difference(vertex, tr.position)
+#            distance = vector3.distance(vertex, tr.position)
+#            ray_dir = vector3.subtract(vertex, tr.position)
 #            ray_ori = tr.position
-#            ray = Ray(ray_ori, Vector.Normalize(ray_dir))
+#            ray = Ray(ray_ori, vector3.normalize(ray_dir))
 #            for i in range(0, len(sorted_list)):
 #                intersection = ray.Face_intersection(sorted_list[i])
 #                if not intersection:
 #                    continue
-#                if Vector.Distance(intersection, tr.position)<distance and Vector.Distance(intersection, tr.position)>0
+#                if vector3.distance(intersection, tr.position)<distance and vector3.distance(intersection, tr.position)>0

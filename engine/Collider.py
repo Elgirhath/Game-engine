@@ -1,4 +1,4 @@
-from engine.Vector import Vector
+from engine.math import vector3
 from engine.Quaternion import Quaternion
 from engine import Mesh
 
@@ -10,7 +10,7 @@ class Sphere_collider():
         
     def Collide(self, other):
         if type(other) is Sphere_collider:
-            if Vector.Distance(other.center, self.center) <= self.radius + other.radius:
+            if vector3.distance(other.center, self.center) <= self.radius + other.radius:
                 return True
         return False
             
@@ -57,17 +57,17 @@ class Collision():
         
 def SAT_collision(collider1, collider2):
     points1 = list(collider1.points)
-    center1 = Vector.Add(collider1.parent.transform.position, Quaternion.rotate_vector(collider1.center, collider1.parent.transform.rotation))
+    center1 = vector3.add(collider1.parent.transform.position, Quaternion.rotate_vector(collider1.center, collider1.parent.transform.rotation))
     for i in range(0, len(points1)):
         points1[i] = Quaternion.rotate_vector(points1[i], collider1.parent.transform.rotation)
-        points1[i] = Vector.Add(points1[i], center1)
+        points1[i] = vector3.add(points1[i], center1)
         
         
     points2 = list(collider2.points)
-    center2 = Vector.Add(collider2.parent.transform.position, Quaternion.rotate_vector(collider2.center, collider2.parent.transform.rotation))
+    center2 = vector3.add(collider2.parent.transform.position, Quaternion.rotate_vector(collider2.center, collider2.parent.transform.rotation))
     for i in range(0, len(points2)):
         points2[i] = Quaternion.rotate_vector(points2[i], collider2.parent.transform.rotation)
-        points2[i] = Vector.Add(points2[i], center2)
+        points2[i] = vector3.add(points2[i], center2)
     
     
     for normal in collider1.normals:
@@ -75,7 +75,7 @@ def SAT_collision(collider1, collider2):
         min1 = None
         max1 = None
         for point in points1:
-            axis_view = Vector.dot(rotated_normal, point)
+            axis_view = vector3.dot(rotated_normal, point)
             if min1 == None or min1 > axis_view:
                 min1 = axis_view
             if max1 == None or max1 < axis_view:
@@ -84,7 +84,7 @@ def SAT_collision(collider1, collider2):
         min2 = None
         max2 = None
         for point in points2:
-            axis_view = Vector.dot(rotated_normal, point)
+            axis_view = vector3.dot(rotated_normal, point)
             if min2 == None or min2 > axis_view:
                 min2 = axis_view
             if max2 == None or max2 < axis_view:
@@ -98,7 +98,7 @@ def SAT_collision(collider1, collider2):
         min1 = None
         max1 = None
         for point in points1:
-            axis_view = Vector.dot(rotated_normal, point)
+            axis_view = vector3.dot(rotated_normal, point)
             if min1 == None or min1 > axis_view:
                 min1 = axis_view
             if max1 == None or max1 < axis_view:
@@ -107,7 +107,7 @@ def SAT_collision(collider1, collider2):
         min2 = None
         max2 = None
         for point in points2:
-            axis_view = Vector.dot(rotated_normal, point)
+            axis_view = vector3.dot(rotated_normal, point)
             if min2 == None or min2 > axis_view:
                 min2 = axis_view
             if max2 == None or max2 < axis_view:
@@ -118,8 +118,8 @@ def SAT_collision(collider1, collider2):
     return True
 
 def Point_collision(box, point):
-    box_center = Vector.Add(box.parent.transform.position, Quaternion.rotate_vector(box.center, box.parent.transform.rotation))
-    rotated_point = Quaternion.rotate_vector(Vector.Difference(point, box_center), box.parent.transform.rotation.conjugate())
+    box_center = vector3.add(box.parent.transform.position, Quaternion.rotate_vector(box.center, box.parent.transform.rotation))
+    rotated_point = Quaternion.rotate_vector(vector3.subtract(point, box_center), box.parent.transform.rotation.conjugate())
     if abs(rotated_point[0]) > box.size[0]*box.parent.transform.scale[0]:
         return False
     if abs(rotated_point[1]) > box.size[1]*box.parent.transform.scale[1]:

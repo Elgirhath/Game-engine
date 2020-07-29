@@ -1,5 +1,5 @@
 from engine.Quaternion import Quaternion
-from engine.Vector import Vector
+from engine.math import vector3
 from engine.Transform import Transform
 from engine.Mesh import Edge
 
@@ -10,14 +10,14 @@ class Cube():
         self.edges_init = []
         self.vertices_init = []
         
-        self.vertices_init.append(Vector.Add((0.5,0.5,0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((0.5,-0.5,0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((-0.5,-0.5,0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((-0.5,0.5,0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((0.5,0.5,-0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((0.5,-0.5,-0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((-0.5,-0.5,-0.5), self.transform.position))
-        self.vertices_init.append(Vector.Add((-0.5,0.5,-0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((0.5,0.5,0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((0.5,-0.5,0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((-0.5,-0.5,0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((-0.5,0.5,0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((0.5,0.5,-0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((0.5,-0.5,-0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((-0.5,-0.5,-0.5), self.transform.position))
+        self.vertices_init.append(vector3.add((-0.5,0.5,-0.5), self.transform.position))
         
         self.edges_init.append(Edge(self.vertices_init[0], self.vertices_init[1]))
         self.edges_init.append(Edge(self.vertices_init[1], self.vertices_init[2]))

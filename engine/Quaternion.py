@@ -1,5 +1,5 @@
 import math
-from engine.Vector import Vector
+from engine.math import vector3
 import numpy as np
 import quaternion
 
@@ -13,8 +13,8 @@ class Quaternion():
         
     @classmethod
     def from_angle_axis(cls, angle, axis):
-        axis = Vector.Normalize(axis)
-        v = Vector.Scale(axis, math.radians(angle))
+        axis = vector3.normalize(axis)
+        v = vector3.scale(axis, math.radians(angle))
         q = quaternion.from_rotation_vector(v)
         return cls.from_np_quaternion(q)
         

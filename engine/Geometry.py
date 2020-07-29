@@ -1,4 +1,4 @@
-from engine.Vector import Vector
+from engine.math import vector3
 
 class Plane():
     def __init__(self, factor_tupple):
@@ -7,26 +7,26 @@ class Plane():
     def normal(self):
         return (self.factors[0], self.factors[1], self.factors[2])
     
-    def Normalize(self):
+    def normalize(self):
         normal = self.normal()
-        if Vector.Magnitude(normal)!=0:
-            scale = 1/Vector.Magnitude(normal)
-            normal = Vector.Scale(normal, scale)
+        if vector3.magnitude(normal)!=0:
+            scale = 1/vector3.magnitude(normal)
+            normal = vector3.scale(normal, scale)
             d = self.factors[3]*scale
             self.factors = (normal[0], normal[1], normal[2], d)
             
     def Invert_normal(self):
-        self.factors = Vector.Scale(self.factors, -1)
+        self.factors = vector3.scale(self.factors, -1)
         
     def Switch_normal_by_vector(self, vector):
-        if Vector.dot(self.normal(), vector)<0:
+        if vector3.dot(self.normal(), vector)<0:
             self.Invert_normal()
         
     def From_points(vertex1, vertex2, vertex3):
-        plane_vector1 = Vector.Difference(vertex1, vertex2)
-        plane_vector2 = Vector.Difference(vertex2, vertex3)
-        normal = Vector.cross(plane_vector1, plane_vector2)
-        normal = Vector.Normalize(normal)
+        plane_vector1 = vector3.subtract(vertex1, vertex2)
+        plane_vector2 = vector3.subtract(vertex2, vertex3)
+        normal = vector3.cross(plane_vector1, plane_vector2)
+        normal = vector3.normalize(normal)
         a = normal[0]
         b = normal[1]
         c = normal[2]
@@ -43,8 +43,8 @@ class Plane():
         return plane
     
     def From_vectors(vector1, vector2, origin_point):
-        normal = Vector.cross(vector1, vector2)
-        normal = Vector.Normalize(normal)
+        normal = vector3.cross(vector1, vector2)
+        normal = vector3.normalize(normal)
         a = normal[0]
         b = normal[1]
         c = normal[2]
@@ -68,7 +68,7 @@ class Plane():
         """
             Returns:
                 0 if point lays on the plane
-                Distance from the plane if point is on positive side of plane
+                distance from the plane if point is on positive side of plane
                 Negative distance if point is on negative side of plane
         """
         if self.factors[2] != 0.0:
@@ -78,8 +78,8 @@ class Plane():
         else:
             plane_point = (-self.factors[3] / self.factors[0], 0.0, 0.0)
 
-        points_diff = Vector.Difference(point, plane_point)
-        return Vector.dot(points_diff, self.normal())
+        points_diff = vector3.subtract(point, plane_point)
+        return vector3.dot(points_diff, self.normal())
         
     def string(self):
         return str(self.factors[0]) + "*x + " + str(self.factors[1]) + "*y + " + str(self.factors[2]) + "*z + " + str(self.factors[3]) + " = 0"
@@ -96,5 +96,5 @@ class Plane():
             return True
     
 def Axis_view(point, axis):
-    k = Vector.dot(point, axis)/Vector.Magnitude(point)**2
+    k = vector3.dot(point, axis)/vector3.magnitude(point)**2
     return k
