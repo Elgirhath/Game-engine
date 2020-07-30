@@ -12,7 +12,7 @@ from engine.render import Screen
 from engine.render.camera import camera
 
 player = Mesh.Object((0,0,0.9))
-cam = camera.Camera((0,0,0.9), resolution = (1360,768))
+cam = camera.Camera((0,0,0.9), resolution = (1366,768))
 player.add_camera(cam)
 player.collider = Collider.Box_collider(player, (0, 0, 0), (0.1, 0.1, 0.85))
 
@@ -376,9 +376,9 @@ while not game_exit:
     Screen.Render()
     if cam.resolution == (800, 600):
         pyinit.game_display.blit(Gun.image, (15,185))
-        
     elif cam.resolution == (1366, 768):
         pyinit.game_display.blit(Gun.image, (190,238))
+    Screen.render_text()
         
     if show_score:
         score_timer -= Other.delta_time

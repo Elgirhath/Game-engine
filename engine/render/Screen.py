@@ -23,6 +23,7 @@ def Render():
     for face in Mesh.all_faces:
         draw_face(face, face.material.color, pyinit.game_display)
 
+def render_text():
     text_renderer.render()
 
 def draw_edge(edge, color, display):
