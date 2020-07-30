@@ -2,7 +2,7 @@
 
 This is a game engine realised for a "Introduction to programming" course on the first semester of Computer Science on AGH UST. The task was to create a game with pygame, but I didn't really want to create a 2D game, so I built a 3D engine first.
 
-<img alt="Gameplay showcase" src="https://s7.gifyu.com/images/engine_showcase_quality_87.gif?raw=true" width="600px">
+<img alt="Gameplay showcase" src="engine_showcase.gif?raw=true" width="600px">
 
 The engine supports:
 
