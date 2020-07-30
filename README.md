@@ -1,11 +1,28 @@
 # Game-engine
 
-This game engine is built with python and a library Pygame. It provides user with libraries responsible for loading objects from .obj files, setting materials, importing images, transforming objects (including moving, scaling and rotating by any axis), setting custom colliders, creating sound sources and mixing the sound.
+This is a game engine realised for a "Introduction to programming" course on the first semester of Computer Science on AGH UST. The task was to create a game with pygame, but I didn't really want to create a 2D game, so I built a 3D engine first.
 
-I have built a basic game using the engine, in which a player can shoot the targets and interact with objects and buttons. It presents the work of colliders, ray collision of shooting, changing materials of the targets and gravity.
+![Game preview](https://s7.gifyu.com/images/engine_showcase_quality_87.gif)
 
-![Game preview](https://github.com/Elgirhath/Game-engine/blob/master/preview.gif)
+The engine supports:
 
-**Why was it created with Python? It's probably the worst language for game engine...**
+* 3D rendering
+* Importing 3D models with color materials
+* Collision detection
+* Rigidbodies and gravity
+* Raycasts
+* Sounds
+* Text display
+* Transformations and quaternion rotations
 
-*On the first semester of studies I had to create a project with Python and I actually used this project there. It also taught me a lot about this language.*
+### How to run
+
+To run the game you will need python, [pygame](https://www.pygame.org), [numpy](https://numpy.org) and [quaternion](https://pypi.org/project/numpy-quaternion/). Then just run:
+
+```
+python ./TheGame.py
+```
+
+## The game
+
+This game has no name but can be used as a famous Kovaak's aim training alternative (I've been using it myself). While the engine was written for around 4 months the game was written in just a few sleepless hours before the deadline.
